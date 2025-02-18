@@ -18,43 +18,40 @@ void init_tables() {
     action_table[0][T_INT] = (Action){SHIFT, 5}; // NUM → I5
     action_table[0][T_FLOAT] = (Action){SHIFT, 5}; // NUM → I5
 
-    action_table[1][T_SEMICOLON] = (Action){SHIFT, 6}; // + → I6
-    action_table[1][T_CLOSE_PAR] = (Action){ACCEPT, 0}; // Accept
+    action_table[1][T_SUM] = (Action){SHIFT, 6}; // + → I6
 
-    action_table[2][T_SEMICOLON] = (Action){SHIFT, 7}; // * → I7
+    action_table[2][T_MULT] = (Action){SHIFT, 7}; // * → I7
 
     action_table[4][T_OPEN_PAR] = (Action){SHIFT, 4}; // ( → I4
     action_table[4][T_INT] = (Action){SHIFT, 5}; // NUM → I5
     action_table[4][T_FLOAT] = (Action){SHIFT, 5}; // NUM → I5
 
-    action_table[5][T_CLOSE_PAR] = (Action){REDUCE, 6}; // F → NUM
+    action_table[6][T_OPEN_PAR] = (Action){SHIFT, 4}; // ( → I4
+    action_table[6][T_INT] = (Action){SHIFT, 5}; // NUM → I5
+    action_table[6][T_FLOAT] = (Action){SHIFT, 5}; // NUM → I5
 
     action_table[7][T_OPEN_PAR] = (Action){SHIFT, 4}; // ( → I4
-    action_table[7][T_INT] = (Action){SHIFT, 5}; // NUM → I5
-    action_table[7][T_FLOAT] = (Action){SHIFT, 5}; // NUM → I5
 
-    action_table[8][T_SEMICOLON] = (Action){SHIFT, 6}; // + → I6
+    action_table[8][T_SUM] = (Action){SHIFT, 6}; // + → I6
     action_table[8][T_CLOSE_PAR] = (Action){SHIFT, 11}; // ) → I11
 
-    action_table[9][T_SEMICOLON] = (Action){SHIFT, 7}; // * → I7
+    action_table[9][T_MULT] = (Action){SHIFT, 7}; // * → I7
 
-    action_table[10][T_CLOSE_PAR] = (Action){REDUCE, 4}; // T → T * F
-
-    action_table[11][T_CLOSE_PAR] = (Action){REDUCE, 5}; // F → (E)
+    // TODO: Falten els REDUCE i ACCEPT
 
     
 
     // GOTO table definition
-    goto_table[0][0] = 1; // E → I1
-    goto_table[0][1] = 2; // T → I2
-    goto_table[0][2] = 3; // F → I3
+    goto_table[0][E] = 1; // E → I1
+    goto_table[0][T] = 2; // T → I2
+    goto_table[0][F] = 3; // F → I3
 
-    goto_table[4][0] = 8; // E → I8
-    goto_table[4][1] = 2; // T → I2
-    goto_table[4][2] = 3; // F → I3
+    goto_table[4][E] = 8; // E → I8
+    goto_table[4][T] = 2; // T → I2
+    goto_table[4][F] = 3; // F → I3
 
-    goto_table[6][1] = 9; // T → I9
-    goto_table[6][2] = 3; // F → I3
+    goto_table[6][T] = 9; // T → I9
+    goto_table[6][F] = 7; // F → I7
 
-    goto_table[7][2] = 10; // F → I10
+    goto_table[7][F] = 10; // F → I10
 }

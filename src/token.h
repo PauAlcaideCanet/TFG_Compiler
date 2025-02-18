@@ -18,9 +18,12 @@ typedef enum {
     T_FLOAT,
 
     //Symbols
-    T_SEMICOLON,
     T_OPEN_PAR,
-    T_CLOSE_PAR
+    T_CLOSE_PAR,
+
+    //Operations
+    T_SUM,
+    T_MULT
 
 } TokenType;
 
@@ -28,7 +31,8 @@ typedef enum {
 typedef struct {
     TokenType type;
     union {
-        int integerConstant;      // For T_INT
-        float floatConstant;      // For T_FLOAT
+        char operator;              // For T_SUM, T_MULT, T_OPEN_PAR and T_CLOSE_PAR
+        int integerConstant;        // For T_INT
+        float floatConstant;        // For T_FLOAT
     } value;
 } Token;

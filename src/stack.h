@@ -14,4 +14,4 @@ void push(Stack* stack, int state);
 int pop(Stack* stack);
 int peek(Stack* stack);
 
-#endif // STACK_H
+#endif 
