@@ -6,6 +6,14 @@
 // Possible actions
 typedef enum { SHIFT, REDUCE, ACCEPT, ERROR } ActionType;
 
+// Enum the non-terminals
+typedef enum {
+    S,
+    E,
+    T,
+    F
+}NON_TERMINALS;
+
 // Estructura per una acció de la taula LR(0)
 typedef struct {
     ActionType type;
@@ -29,13 +37,13 @@ int goto_table[NUM_STATES][NUM_NONTERMINALS];
 
 // Reule definition
 Production_rule rules[] = {
-    {1, 1},  // S → E
-    {2, 3},  // E → E + T
-    {2, 1},  // E → T
-    {3, 3},  // T → T * F
-    {3, 1},  // T → F
-    {4, 3},  // F → (E)
-    {4, 1}   // F → NUM
+    {S, 1},  // S → E
+    {E, 3},  // E → E + T
+    {E, 1},  // E → T
+    {T, 3},  // T → T * F
+    {T, 1},  // T → F
+    {F, 3},  // F → (E)
+    {F, 1}   // F → NUM
 };
 
 // LR (0) table initialization
