@@ -1,3 +1,7 @@
+
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -22,16 +26,5 @@ Parser *create_parser(Token *tokens) {
     return parser;
 }
 
-static Token *peek_current_token(Parser *parser) {
-    if (parser->index < parser->token_count) { // If there are still tokens
-        return &parser->tokens[parser->index];
-    }
-    return NULL;
-}
 
-static Token *pop_current_token(Parser *parser) {
-    if (parser->index < parser->token_count) {
-        return &parser->tokens[parser->index++];
-    }
-    return NULL;
-}
+#endif

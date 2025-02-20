@@ -1,15 +1,52 @@
 
-#include <table.h>
+#include "table.h"
 
-void init_tables() {
+#define NUM_STATES 12       // This is in our case must be changed if the rules are changed
+#define NUM_TERMINALS 6     // This is in our case must be changed if the rules are changed
+#define NUM_NONTERMINALS 3  // This is in our case must be changed if the rules are changed
 
-    // Initialize all with ERROR value
+Action** init_actionTable(){
+
+    //Allocate memory for the action table
+    Action** action_table = malloc(NUM_STATES * sizeof(Action*));
+    for (int i = 0; i < NUM_STATES; i++) {
+        action_table[i] = malloc(NUM_TERMINALS * sizeof(Action));
+    }
+
+    // Initialize all with ERROR value or with the REDUCE if is a reduce state
     for (int i = 0; i < NUM_STATES; i++) {
         for (int j = 0; j < NUM_TERMINALS; j++) {
-            action_table[i][j].type = ERROR;
-        }
-        for (int j = 0; j < NUM_NONTERMINALS; j++) {
-            goto_table[i][j] = -1;
+            switch (i){
+
+                case 2:
+                    action_table[i][j] = (Action){REDUCE, 2};
+                    break;
+                
+                case 3:
+                    action_table[i][j] = (Action){REDUCE, 4};
+                    break;
+
+                case 5:
+                    action_table[i][j] = (Action){REDUCE, 6};
+                    break;
+
+                case 9:
+                    action_table[i][j] = (Action){REDUCE, 1};
+                    break;
+
+                case 10:
+                    action_table[i][j] = (Action){REDUCE, 3};
+                    break;
+
+                case 11:
+                    action_table[i][j] = (Action){REDUCE, 5};
+                    break;
+
+                default:
+                    action_table[i][j] = (Action){ERROR, -1};
+                    break;
+            }
+           
         }
     }
 
@@ -37,9 +74,24 @@ void init_tables() {
 
     action_table[9][T_MULT] = (Action){SHIFT, 7}; // * → I7
 
-    // TODO: Falten els REDUCE i ACCEPT
+    action_table[1][T_EOF] = (Action){ACCEPT,0}; // S → e ACCEPT
 
-    
+    return action_table;
+}
+
+int** init_gotoTable() {
+
+    //Allocate memory for the goto table
+    int** goto_table = malloc(NUM_STATES * sizeof(int*));
+    for (int i = 0; i < NUM_STATES; i++) {
+        goto_table[i] = malloc(NUM_TERMINALS * sizeof(int));
+    }
+
+    for (int i = 0; i < NUM_STATES; i++) {
+        for (int j = 0; j < NUM_NONTERMINALS; j++) {
+            goto_table[i][j] = -1;
+        }
+    }
 
     // GOTO table definition
     goto_table[0][E] = 1; // E → I1
@@ -54,4 +106,23 @@ void init_tables() {
     goto_table[6][F] = 7; // F → I7
 
     goto_table[7][F] = 10; // F → I10
+
+    return goto_table;
+}
+
+Production_rule* init_prodRules(){
+
+    // Dynamically allocate memory for the production rules
+    Production_rule* rules = malloc(7 * sizeof(Production_rule));
+
+    // Reule definition
+    rules[0] = (Production_rule){S, 1};  // S → E
+    rules[1] = (Production_rule){E, 3};  // E → E + T
+    rules[2] = (Production_rule){E, 1};  // E → T
+    rules[3] = (Production_rule){T, 3};  // T → T * F
+    rules[4] = (Production_rule){T, 1};  // T → F
+    rules[5] = (Production_rule){F, 3};  // F → (E)
+    rules[6] = (Production_rule){F, 1};  // F → NUM
+
+    return rules;
 }

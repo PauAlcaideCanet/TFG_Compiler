@@ -5,6 +5,8 @@
 * Made by Pau Alcaide Canet 
 */
 
+#ifndef TOKEN_H
+#define TOKEN_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +25,11 @@ typedef enum {
 
     //Operations
     T_SUM,
-    T_MULT
+    T_MULT,
+
+    //End of file (Assume we only have one single mathematical operation)
+    // If we wanted to have more than one we would need something to separate them (New-line or semicolon)
+    T_EOF
 
 } TokenType;
 
@@ -36,3 +42,7 @@ typedef struct {
         float floatConstant;        // For T_FLOAT
     } value;
 } Token;
+
+void printToken(Token token);
+
+#endif
