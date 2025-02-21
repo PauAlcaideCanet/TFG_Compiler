@@ -27,23 +27,30 @@ void parse(Token tokens[], int length) {
 
         Action action = action_table[state][symbol];
 
-        printf("Current state: %d, Token: %d\n", state, symbol);
-        printToken(tokens[i]);
+        
+        printf("Current state: %d\n", state);
+        //printToken(tokens[i]);
 
         if (action.type == SHIFT) {
             push(&s, action.state);
             i++; //Go read the next token
         } else if (action.type == REDUCE) {
+            printf("I start the reduce\n");
             Production_rule p = rules[action.state];
+            printf("The production rule is %d %d\n", p.lhs, p.rhs_size);
             for (int j = 0; j < p.rhs_size; j++){ 
                 pop(&s); // Pop RHS symbols
             } 
+
+            printf("Now the state is %d\n", peek(&s));
             int new_state = goto_table[peek(&s)][p.lhs]; // Goto based on LHS
+            printf("And the new state is: %d\n", new_state);
             push(&s, new_state);
         } else if (action.type == ACCEPT) {
             printf("Parsing successful!\n");
             return;
         } else {
+            printf("The problem is with the state %d and the symbol %d", state, symbol);
             printf("Syntax error!\n");
             return;
         }
@@ -56,11 +63,15 @@ int main() {
     Token tokens[] = {
         {T_INT, .value.integerConstant = 2},   
         {T_SUM, .value.operator = '+'},        
-        {T_INT, .value.integerConstant = 3},   
+        {T_INT, .value.integerConstant = 3},
+        {T_SUM, .value.operator = '*'},    
+        {T_INT, .value.integerConstant = 4},
+        {T_SUM, .value.operator = '+'},  
+        {T_INT, .value.integerConstant = 5},
         {T_EOF}                                
     };
 
-    parse(tokens, 4);
+    parse(tokens, 8);
 
     return 0;
 }

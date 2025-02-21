@@ -27,9 +27,7 @@ typedef struct {
 } Production_rule;
 
 
-// LR (0) table initialization
-void init_tables();
-
+//Tables initialization
 Action** init_actionTable();
 int** init_gotoTable();
 Production_rule* init_prodRules();

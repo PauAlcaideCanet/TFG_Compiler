@@ -2,7 +2,7 @@
 #include "table.h"
 
 #define NUM_STATES 12       // This is in our case must be changed if the rules are changed
-#define NUM_TERMINALS 6     // This is in our case must be changed if the rules are changed
+#define NUM_TERMINALS 7     // This is in our case must be changed if the rules are changed
 #define NUM_NONTERMINALS 3  // This is in our case must be changed if the rules are changed
 
 Action** init_actionTable(){
@@ -35,15 +35,15 @@ Action** init_actionTable(){
                     break;
 
                 case 10:
-                    action_table[i][j] = (Action){REDUCE, 3};
-                    break;
-
-                case 11:
                     action_table[i][j] = (Action){REDUCE, 5};
                     break;
 
+                case 11:
+                    action_table[i][j] = (Action){REDUCE, 3};
+                    break;
+
                 default:
-                    action_table[i][j] = (Action){ERROR, -1};
+                    action_table[i][j].type = ERROR;
                     break;
             }
            
@@ -68,9 +68,11 @@ Action** init_actionTable(){
     action_table[6][T_FLOAT] = (Action){SHIFT, 5}; // NUM → I5
 
     action_table[7][T_OPEN_PAR] = (Action){SHIFT, 4}; // ( → I4
+    action_table[7][T_INT] = (Action){SHIFT, 5}; // NUM → I5
+    action_table[7][T_FLOAT] = (Action){SHIFT, 5}; // NUM → I5
 
     action_table[8][T_SUM] = (Action){SHIFT, 6}; // + → I6
-    action_table[8][T_CLOSE_PAR] = (Action){SHIFT, 11}; // ) → I11
+    action_table[8][T_CLOSE_PAR] = (Action){SHIFT, 10}; // ) → I11
 
     action_table[9][T_MULT] = (Action){SHIFT, 7}; // * → I7
 
@@ -103,9 +105,9 @@ int** init_gotoTable() {
     goto_table[4][F] = 3; // F → I3
 
     goto_table[6][T] = 9; // T → I9
-    goto_table[6][F] = 7; // F → I7
+    goto_table[6][F] = 3; // F → I3
 
-    goto_table[7][F] = 10; // F → I10
+    goto_table[7][F] = 11; // F -> I11
 
     return goto_table;
 }
