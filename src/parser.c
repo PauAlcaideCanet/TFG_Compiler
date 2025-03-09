@@ -62,12 +62,11 @@ int main() {
     
     Token tokens[] = {
         {T_INT, .value.integerConstant = 2},   
-        {T_SUM, .value.operator = '+'},        
-        {T_INT, .value.integerConstant = 3},
-        {T_SUM, .value.operator = '*'},    
-        {T_INT, .value.integerConstant = 4},
-        {T_SUM, .value.operator = '+'},  
-        {T_INT, .value.integerConstant = 5},
+        {T_OPEN_PAR, .value.operator = '('},        
+        {T_INT, .value.integerConstant = 2},
+        {T_SUM, .value.operator = '+'},
+        {T_INT, .value.integerConstant = 2},
+        {T_CLOSE_PAR, .value.operator = ')'}, 
         {T_EOF}                                
     };
 
