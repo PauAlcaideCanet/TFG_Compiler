@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "token.h"
-#include "table.h"
+#include "automata.h"
 #include "stack.h"
 
 
@@ -22,7 +22,7 @@ void parse(Token tokens[], int length) {
     
     while (1) {     //While true
         int state = peek(&s);
-        int symbol = tokens[i].type; // Use TokenType directly as index
+        int symbol = tokens[i].category; // Use TokenType directly as index
 
 
         Action action = action_table[state][symbol];
@@ -57,20 +57,3 @@ void parse(Token tokens[], int length) {
     }
 }
 
-
-int main() {
-    
-    Token tokens[] = {
-        {T_INT, .value.integerConstant = 2},   
-        {T_OPEN_PAR, .value.operator = '('},        
-        {T_INT, .value.integerConstant = 2},
-        {T_SUM, .value.operator = '+'},
-        {T_INT, .value.integerConstant = 2},
-        {T_CLOSE_PAR, .value.operator = ')'}, 
-        {T_EOF}                                
-    };
-
-    parse(tokens, 8);
-
-    return 0;
-}

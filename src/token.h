@@ -29,18 +29,17 @@ typedef enum {
 
     //End of file (Assume we only have one single mathematical operation)
     // If we wanted to have more than one we would need something to separate them (New-line or semicolon)
-    T_EOF
+    T_EOF,
+
+    //This is temporary
+    T_NON_TERMINAL
 
 } TokenType;
 
 // Define the Token struct
 typedef struct {
-    TokenType type;
-    union {
-        char operator;              // For T_SUM, T_MULT, T_OPEN_PAR and T_CLOSE_PAR
-        int integerConstant;        // For T_INT
-        float floatConstant;        // For T_FLOAT
-    } value;
+    TokenType category;
+    char *lexeme;
 } Token;
 
 void printToken(Token token);
