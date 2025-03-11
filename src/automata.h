@@ -4,11 +4,19 @@
 #include "token.h"
 #include "stack.h"
 
+
+// Production rule definition
+typedef struct {
+    Token lhs;      // Left hand side
+    Token* rhs;     // Right hand side
+    int rhs_size;   // Right hand side size
+} Production_rule;
+
 //Grammar 
 typedef struct{
-    Token *terminals;
+    char** terminals;
     int num_terminals;
-    Token *non_terminals;
+    char** non_terminals;
     int num_non_terminals;
     Production_rule* rules;
     int num_rules; 
@@ -16,18 +24,10 @@ typedef struct{
 
 //Alphabet entries definition
 typedef struct {
-    Token symbol;
+    char* symbol;
     int column;
     int is_terminal; // 1 if true | 0 if false
 } Alphabet_symbol;
-
-// Production rule definition
-typedef struct {
-    Token lhs;      // Left hand side
-    Token* rhs;     // Right hand side
-    int rhs_size;   // Right hand sise size
-} Production_rule;
-
 
 // Possible actions
 typedef enum { SHIFT, REDUCE, ACCEPT, ERROR } ActionType;
@@ -40,11 +40,10 @@ typedef struct {
 
 
 //Automata definition
-
 typedef struct {
     Alphabet_symbol *alphabet;
     int num_symbols;                  
-    int num_states; //The states are contained in the transition table        
+    int num_states;        
     int start_state;     
     int *accepting_states;     
     Action** transition_table;                
@@ -68,13 +67,13 @@ typedef struct {
     #define NUM_NON_TERMINALS 4
     #define NON_TERMINALS {"S", "E", "T", "F"} 
     #define NUM_RULES 7
-    #define PROD_RULES {    {{T_NON_TERMINAL, "S"}, {{T_NON_TERMINAL,"E"}, {T_EOF, ""}}, 1}                             /*-Rule 0-*/, \
+    #define PROD_RULES {    {{T_NON_TERMINAL, "S"}, {{T_NON_TERMINAL,"E"}, {T_EOF, ""}}, 2}                             /*-Rule 0-*/, \
                             {{T_NON_TERMINAL, "E"}, {{T_NON_TERMINAL, "E"}, {T_SUM, "+"}, {T_NON_TERMINAL, "T"}}, 3}    /*-Rule 1-*/, \
                             {{T_NON_TERMINAL, "E"}, {{T_NON_TERMINAL, "T"}}, 1}                                         /*-Rule 2-*/, \
                             {{T_NON_TERMINAL, "T"}, {{T_NON_TERMINAL, "T"}, {T_MULT, "*"}, {T_NON_TERMINAL, "F"}}, 3}   /*-Rule 3-*/, \
                             {{T_NON_TERMINAL, "T"}, {{T_NON_TERMINAL, "F"}}, 1}                                         /*-Rule 4-*/, \
                             {{T_NON_TERMINAL, "F"}, {{T_OPEN_PAR, "("}, {T_NON_TERMINAL, "E"}, {T_CLOSE_PAR, ")"}}, 3}  /*-Rule 5-*/, \
-                            {{T_NON_TERMINAL, "F"}, {{T_INT, ""}}, 1}                                                   /*-Rule 6-*/, \
+                            {{T_NON_TERMINAL, "F"}, {{T_INT, "" }}, 1}                                                   /*-Rule 6-*/, \
     }
     #define NUM_STATES 12
     #define ACCEPT_STATES {1}
@@ -105,9 +104,9 @@ typedef struct {
 
 // Initialization functions
 void initCFG(CFG *grammar);
-Alphabet_symbol* createAlphabet(const CFG *grammar);
-Automata* createAutomata(const CFG *grammar);
-SR_Automata* createSRAutomata();
+void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet);
+void initAutomata(const CFG *grammar, Automata* automata);
+void initSRAutomata(SR_Automata* automata);
 
 // Execution
 void runSRAutomata(SR_Automata *SRAutomata, Token input_token);

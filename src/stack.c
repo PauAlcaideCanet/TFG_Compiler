@@ -23,6 +23,7 @@ int pop(Stack* stack) {
         return stack->items[stack->top];
     }
     printf("Error: Stack underflow!\n");
+    return -1;
 }
 
 // Peek function
@@ -31,4 +32,5 @@ int peek(Stack* stack) {
         return stack->items[stack->top];
     }
     printf("Error: Stack is empty!\n");
+    return -1;
 }
