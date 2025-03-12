@@ -3,8 +3,43 @@
 #include "stack.h"
 #include "automata.h"
 
+// Get the Rules from its definition
+Production_rule* getProductionRules() {     //Funciona!
+
+    static const char* raw_prod_rules[NUM_RULES][3][MAX_RHSS][2] = PROD_RULES;
+
+
+    Production_rule* prod_list = malloc(NUM_RULES * sizeof(Production_rule));
+    if (!prod_list) {
+        printf("Memory allocation failed in production rules");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < NUM_RULES; i++) {
+
+        prod_list[i].lhs = createToken(getTokenCategory(raw_prod_rules[i][0][0][0]), raw_prod_rules[i][0][0][1]);
+
+        prod_list[i].rhs_size = atoi(raw_prod_rules[i][2][0][0]);  
+
+        prod_list[i].rhs = malloc(prod_list[i].rhs_size * sizeof(Token));
+        if (!prod_list[i].rhs) {
+            fprintf(stderr, "Memory allocation failed for RHS of rule %d\n", i);
+            exit(EXIT_FAILURE);
+        }
+
+
+        for (int j = 0; j < prod_list[i].rhs_size; j++) { 
+            prod_list[i].rhs[j] = createToken(getTokenCategory(raw_prod_rules[i][1][j][0]), raw_prod_rules[i][1][j][1]);
+        }
+
+
+    }
+
+    return prod_list;
+}
+
 // Initialization of the Context-Free Grammar
-void initCFG(CFG *grammar) {
+void initCFG(CFG *grammar) {        //Segurament funcioni
     
     // Initialize terminals
     grammar->num_terminals = NUM_TERMINALS;
@@ -24,38 +59,15 @@ void initCFG(CFG *grammar) {
         grammar->non_terminals[i] = strdup(non_terminals[i]);
     }
 
-    
-    //----REMOVE------
-    for (int i = 0; i < NUM_TERMINALS; ++i) {
-        printf("Terminal: %s\n",grammar->terminals[i]);   
-    }
-
-    for (int i = 0; i < NUM_TERMINALS; ++i) {
-        printf("Non Terminal: %s\n",grammar->non_terminals[i]);   
-    }
-    //----REMOVE------
 
     //Initialize the rules
-    grammar->num_rules = NUM_RULES;
-
-    Production_rule prod_rules[] = PROD_RULES;
-    grammar->rules = (Production_rule*)malloc(NUM_RULES * sizeof(Production_rule));
-    
-    for (int i = 0; i < NUM_RULES; ++i) {
-        grammar->rules[i].lhs = prod_rules[i].lhs;  //Put the Left Hand Side
-
-        grammar->rules[i].rhs_size = prod_rules[i].rhs_size;
-        grammar->rules[i].rhs = (Token*)malloc(prod_rules[i].rhs_size * sizeof(Token));
-
-        for (int j = 0; j < prod_rules[i].rhs_size; ++j) {
-            grammar->rules[i].rhs[j] = prod_rules[i].rhs[j];  // Copy RHS tokens
-        }
-    }  
+    Production_rule* rules = getProductionRules();
+    grammar->rules = rules;
     
 }
 
 // Alphabet initialization
-void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) {
+void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { //Funciona
     int index = 0;
     for (int i = 0; i < grammar->num_terminals; i++) {
         alphabet[index].symbol = grammar->terminals[i];
@@ -72,12 +84,11 @@ void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) {
 }
 
 // Automata initialization
-void initAutomata(const CFG *grammar, Automata* automata) {
+void initAutomata(const CFG *grammar, Automata* automata) {     //Aixo està bé
     //Init the Alphabet
+    automata->num_symbols = grammar->num_terminals + grammar->num_non_terminals;
     automata->alphabet = malloc(automata->num_symbols * sizeof(Alphabet_symbol));
     initAlphabet(grammar, automata->alphabet);
-
-    automata->num_symbols = grammar->num_terminals + grammar->num_non_terminals;
 
     automata->num_states = NUM_STATES;
     automata->start_state = START_STATE;
@@ -88,72 +99,193 @@ void initAutomata(const CFG *grammar, Automata* automata) {
     automata->accepting_states = malloc(num_accept_states * sizeof(int));
     memcpy(automata->accepting_states, accept_states, num_accept_states * sizeof(int));
 
+    
     //Init the Transitions
-    Action* transitions[] = TRANSITIONS;
+    static Action transition_data[NUM_STATES][NUM_TERMINALS + NUM_NON_TERMINALS] = TRANSITIONS;
     automata->transition_table = malloc(NUM_STATES * sizeof(Action*));
-
+ 
     for (int i = 0; i < NUM_STATES; i++) {
         automata->transition_table[i] = malloc(automata->num_symbols * sizeof(Action));
-        memcpy(automata->transition_table[i], transitions[i], automata->num_symbols * sizeof(Action));
+        for (int j = 0; j < automata->num_symbols; j++) {
+            automata->transition_table[i][j] = transition_data[i][j];
+        }
     }
 
 }
 
-// Inicialitza l'autòmat shift-reduce
+// Shift-Reduce Automata initialization
 void initSRAutomata(SR_Automata* sra) {
-    
+    if (sra == NULL) {
+        fprintf(stderr, "Error: SR_Automata pointer is NULL\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize the context-free grammar (CFG)
+    initCFG(&sra->grammar);
+
+    // Initialize the parsing stack
+    init_stack(&sra->stack);
+    push(&sra->stack, START_STATE); // Start state of the automaton
+
+    // Initialize the automaton using the grammar
+    initAutomata(&sra->grammar, &sra->automata);
 }
 
-// Executa l'autòmat shift-reduce
-void runSRAutomata(SR_Automata *sra, Token input_token) {
-    
+// Returns the associated column for the introduced token 
+int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
+    for (int i = 0; i < num_symbols; i++) {
+        if(alphabet[i].is_terminal){
+            if (strcmp(getCategoryFromToken(token), alphabet[i].symbol) == 0) {
+                return alphabet[i].column;
+            }
+        }else{
+            if (strcmp(token.lexeme, alphabet[i].symbol) == 0) {
+                return alphabet[i].column;
+            }
+        }
+        
+    }
+    return -1; // Error case
+}
+
+// Executes a step of the Shift-Reduce Automata
+int SRAutomata_step(SR_Automata *sra, Token input_token) {
+    if (!sra) {
+        fprintf(stderr, "Error: SR_Automata pointer is NULL.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int state = peek(&sra->stack);
+    printf("The current state is: %d\n", state);
+    printf("And the look ahead is: %s\n", input_token.lexeme);
+    int column = getColumn(input_token, sra->automata.alphabet, sra->automata.num_symbols);
+
+    if (column == -1) {
+        printf("Error: Invalid token '%s'.\n", input_token.lexeme);
+        return -1;
+    }
+
+    Action action = sra->automata.transition_table[state][column];
+
+    switch (action.type) {
+        case SHIFT:
+            push(&sra->stack, action.state);
+            printf("SHIFT: Moved to state %d\n", action.state);
+            break;
+        
+        case REDUCE: {
+            // Fetch the rule to reduce with
+            Production_rule rule = sra->grammar.rules[action.state];
+            printf("REDUCE: Applying rule %d -> %s\n", action.state, rule.lhs.lexeme);
+            printf("The LHS category is: %d\n", rule.lhs.category);
+
+            // Pop the RHS symbols from the stack
+            for (int i = 0; i < rule.rhs_size; i++) {
+                pop(&sra->stack);
+            }
+
+            // Get the current state after popping
+            int new_state = peek(&sra->stack);
+            
+            // Find the column index of the LHS in the automaton's alphabet
+            int lhs_column = getColumn(rule.lhs, sra->automata.alphabet, sra->automata.num_symbols);
+            if (lhs_column == -1) {
+                printf("ERROR: Could not find LHS '%s' in the alphabet!\n", rule.lhs.lexeme);
+                exit(EXIT_FAILURE);
+            }
+
+            // Get the transition state for the LHS
+            Action goto_action = sra->automata.transition_table[new_state][lhs_column];
+            if (goto_action.type == ERROR) {
+                printf("ERROR: No transition found for LHS '%s' in state %d!\n", rule.lhs.lexeme, new_state);
+                exit(EXIT_FAILURE);
+            }
+
+            // Push the new state after reduction
+            push(&sra->stack, goto_action.state);
+            printf("REDUCE: Pushed new state %d after reducing to %s\n", goto_action.state, rule.lhs.lexeme);
+
+            int n = SRAutomata_step(sra, input_token); 
+            return n;
+        }
+        
+        case ACCEPT:
+            printf("Input accepted.\n");
+            break;
+        
+        case ERROR:
+            printf("There has been an error in the parsing process!\nAt token '%s'", input_token.lexeme);
+            return -1;
+        default:
+            printf("Syntax error at token '%s'.\n", input_token.lexeme);
+    }
+    return 0;
 }
 
 // Free the memory of the CFG ---------REVISAR-----------
 void freeCFG(CFG *grammar) {
+    if (!grammar) return;
+
+    // Free terminals
     for (int i = 0; i < grammar->num_terminals; i++) {
         free(grammar->terminals[i]);
     }
     free(grammar->terminals);
 
+    // Free non-terminals
     for (int i = 0; i < grammar->num_non_terminals; i++) {
         free(grammar->non_terminals[i]);
     }
     free(grammar->non_terminals);
 
+    // Free grammar rules
     for (int i = 0; i < grammar->num_rules; i++) {
-        free(grammar->rules[i].rhs);
+        free(grammar->rules[i].lhs.lexeme); // Free LHS lexeme
+
+        // Free RHS lexemes
+        for (int j = 0; j < grammar->rules[i].rhs_size; j++) {
+            free(grammar->rules[i].rhs[j].lexeme);
+        }
+
+        free(grammar->rules[i].rhs); // Free RHS array
     }
-    free(grammar->rules);
+    free(grammar->rules); // Free rules array
 }
 
-// Allibera memòria de l'alfabet 
-void freeAlphabet(Alphabet_symbol *alphabet) {
-    
-}
 
 // Free the memory of the Automata   ---------REVISAR-----------
 void freeAutomata(Automata *automata) {
-    free(automata->alphabet);
-    free(automata->accepting_states);
-    
-    for (int i = 0; i < automata->num_states; i++) {
-        free(automata->transition_table[i]);
+    if (!automata) return;
+
+    // Free alphabet array
+    if (automata->alphabet) {
+        free(automata->alphabet);
+        automata->alphabet = NULL;
     }
-    free(automata->transition_table);
-}
 
-// Allibera memòria de l'autòmat shift-reduce
-void freeSR_Automata(SR_Automata *sra) {
-    
-}
+    // Free accepting states
+    if (automata->accepting_states) {
+        free(automata->accepting_states);
+        automata->accepting_states = NULL;
+    }
 
-// Retorna la columna associada a un token en la taula de transicions
-int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
-    for (int i = 0; i < num_symbols; i++) {
-        if (strcmp(token.lexeme, alphabet[i].symbol) == 0) {
-            return alphabet[i].column;
+    // Free transition table
+    if (automata->transition_table) {
+        for (int i = 0; i < automata->num_states; i++) {
+            if (automata->transition_table[i]) {
+                free(automata->transition_table[i]);
+            }
         }
+        free(automata->transition_table);
+        automata->transition_table = NULL;
     }
-    return -1; // Error case
 }
+
+// Free the memory of the Shift-Reduce Automata --------REVISAR--------
+void freeSR_Automata(SR_Automata *sra) {
+    if (!sra) return;
+
+    freeCFG(&sra->grammar);     // Free grammar rules & lexemes
+    freeAutomata(&sra->automata); // Free automata structures
+}
+

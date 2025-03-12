@@ -4,7 +4,7 @@
 #include "token.h"
 #include "stack.h"
 
-
+#define MAX_RHSS 10
 // Production rule definition
 typedef struct {
     Token lhs;      // Left hand side
@@ -67,13 +67,13 @@ typedef struct {
     #define NUM_NON_TERMINALS 4
     #define NON_TERMINALS {"S", "E", "T", "F"} 
     #define NUM_RULES 7
-    #define PROD_RULES {    {{T_NON_TERMINAL, "S"}, {{T_NON_TERMINAL,"E"}, {T_EOF, ""}}, 2}                             /*-Rule 0-*/, \
-                            {{T_NON_TERMINAL, "E"}, {{T_NON_TERMINAL, "E"}, {T_SUM, "+"}, {T_NON_TERMINAL, "T"}}, 3}    /*-Rule 1-*/, \
-                            {{T_NON_TERMINAL, "E"}, {{T_NON_TERMINAL, "T"}}, 1}                                         /*-Rule 2-*/, \
-                            {{T_NON_TERMINAL, "T"}, {{T_NON_TERMINAL, "T"}, {T_MULT, "*"}, {T_NON_TERMINAL, "F"}}, 3}   /*-Rule 3-*/, \
-                            {{T_NON_TERMINAL, "T"}, {{T_NON_TERMINAL, "F"}}, 1}                                         /*-Rule 4-*/, \
-                            {{T_NON_TERMINAL, "F"}, {{T_OPEN_PAR, "("}, {T_NON_TERMINAL, "E"}, {T_CLOSE_PAR, ")"}}, 3}  /*-Rule 5-*/, \
-                            {{T_NON_TERMINAL, "F"}, {{T_INT, "" }}, 1}                                                   /*-Rule 6-*/, \
+    #define PROD_RULES {    {{"T_NON_TERMINAL", "S"}, {{"T_NON_TERMINAL","E"}, {"T_EOF", ""}}, "2"}                             /*-Rule 0-*/, \
+                            {{"T_NON_TERMINAL", "E"}, {{"T_NON_TERMINAL", "E"}, {"T_SUM", "+"}, {"T_NON_TERMINAL", "T"}}, "3"}    /*-Rule 1-*/, \
+                            {{"T_NON_TERMINAL", "E"}, {{"T_NON_TERMINAL", "T"}}, "1"}                                         /*-Rule 2-*/, \
+                            {{"T_NON_TERMINAL", "T"}, {{"T_NON_TERMINAL", "T"}, {"T_MULT", "*"}, {"T_NON_TERMINAL", "F"}}, "3"}   /*-Rule 3-*/, \
+                            {{"T_NON_TERMINAL", "T"}, {{"T_NON_TERMINAL", "F"}}, "1"}                                         /*-Rule 4-*/, \
+                            {{"T_NON_TERMINAL", "F"}, {{"T_OPEN_PAR", "("}, {"T_NON_TERMINAL", "E"}, {"T_CLOSE_PAR", ")"}}, "3"}  /*-Rule 5-*/, \
+                            {{"T_NON_TERMINAL", "F"}, {{"T_INT", "" }}, "1"}                                                   /*-Rule 6-*/, \
     }
     #define NUM_STATES 12
     #define ACCEPT_STATES {1}
@@ -109,15 +109,14 @@ void initAutomata(const CFG *grammar, Automata* automata);
 void initSRAutomata(SR_Automata* automata);
 
 // Execution
-void runSRAutomata(SR_Automata *SRAutomata, Token input_token);
+int SRAutomata_step(SR_Automata *SRAutomata, Token input_token);
 
 // Free memory functions
 void freeCFG(CFG *grammar);
-void freeAlphabet(Alphabet_symbol *alphabet);
 void freeAutomata(Automata *automata);
 void freeSR_Automata(SR_Automata *SRAutomata);
 
 //Getters
-int getColumn();
-
+int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);
+Production_rule* getProductionRules();
 #endif

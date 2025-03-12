@@ -44,6 +44,8 @@ typedef struct {
 
 void printToken(Token token);
 Token createToken(TokenType type, const char *lexeme);
+TokenType getTokenCategory(const char* type_str);
+char* getCategoryFromToken(Token token);
 void freeToken(Token *token);
 
 #endif
