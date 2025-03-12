@@ -24,7 +24,7 @@ int main() {
     // Process each token using the Shift-Reduce Automaton
     int step = 0;
     int i = 0;
-    while (i < num_tokens && step != -1) {
+    while (i < num_tokens && step != ERROR) {
         step = SRAutomata_step(&sra, tokens[i]);
         freeToken(&tokens[i]);
 
