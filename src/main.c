@@ -6,11 +6,11 @@
 
 int main() {
     
-    
+    // Create the automata and initializate it
     SR_Automata sra;
     initSRAutomata(&sra);
 
-    // Example list of tokens (This should be dynamically generated in a real parser)
+    // List of tokens to parse
     Token tokens[] = {
         createToken(T_OPEN_PAR, "("),
         createToken(T_INT, "5"),
@@ -19,6 +19,7 @@ int main() {
         createToken(T_CLOSE_PAR, ")"),
         createToken(T_EOF, "")
     };
+
     int num_tokens = sizeof(tokens) / sizeof(tokens[0]);
 
     // Process each token using the Shift-Reduce Automaton
@@ -31,6 +32,8 @@ int main() {
         i++;
     }
 
+    //Free the memory
     freeSR_Automata(&sra);
+    
     return 0; 
 }
