@@ -55,10 +55,7 @@ typedef struct {
     CFG grammar;              
 } SR_Automata;
 
-
-//S'ha de fer una funció que ho processi
-
-#define NUM_GRAMMAR 1
+#define NUM_GRAMMAR 2
 
 #if (NUM_GRAMMAR == 1)
     //Define Automata 1
@@ -96,10 +93,30 @@ typedef struct {
 }
     
 #elif (NUM_GRAMMAR == 2)
-    //Define Automata 2
+    #define NUM_TERMINALS 5
+    #define TERMINALS {"T_INT", "T_OPEN_PAR", "T_CLOSE_PAR", "T_SUM", "T_EOF"}
+    #define NUM_NON_TERMINALS 2
+    #define NON_TERMINALS {"S","E"} 
+    #define NUM_RULES 3
+    #define PROD_RULES {    { {"T_NON_TERMINAL", "S"}, { {"T_NON_TERMINAL", "E"} }, "1" },          /*-Rule 0-*/ \
+                            { {"T_NON_TERMINAL", "E"}, { {"T_INT", ""} }, "1" },                    /*-Rule 1-*/ \
+                            { {"T_NON_TERMINAL", "E"}, { {"T_NON_TERMINAL", "E"}, {"T_SUM", "+"}, {"T_OPEN_PAR", "("}, {"T_NON_TERMINAL", "E"}, {"T_CLOSE_PAR", ")"} }, "5" } /*-Rule 2-*/ \
+                        }
+    #define NUM_STATES 7
+    #define ACCEPT_STATES {2}
+    #define START_STATE 0
+
+    #define TRANSITIONS {   {{SHIFT, 1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 2}},            /*-State 0-*/\
+                            {{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1}},          /*-State 1-*/\
+                            {{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 3},{ACCEPT, 0},{ERROR, -1},{ERROR, -1}},           /*-State 2-*/\
+                            {{ERROR, -1},{SHIFT, 4},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1}},           /*-State 3-*/\
+                            {{SHIFT, 1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 5}},           /*-State 4-*/\
+                            {{ERROR, -1},{ERROR, -1},{SHIFT, 6},{SHIFT, 3},{ERROR, -1},{ERROR, -1},{ERROR, -1}},           /*-State 5-*/\
+                            {{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2}}           /*-State 6-*/\
+                        }
     
 #else
-    #error "NUM_GRAMMAR is not any automata option!"
+    #define NO_AUTOMATA_ERROR "NUM_GRAMMAR is not any automata option!"
 #endif
 
 // Initialization functions

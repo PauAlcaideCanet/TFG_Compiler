@@ -15,7 +15,7 @@ Production_rule* getProductionRules() {
     }
 
     for (int i = 0; i < NUM_RULES; i++) {
-        // Fill the Left thand side with its token
+        // Fill the Left hand side with its token
         prod_list[i].lhs = createToken(getTokenCategory(raw_prod_rules[i][0][0][0]), raw_prod_rules[i][0][0][1]);
         
         prod_list[i].rhs_size = atoi(raw_prod_rules[i][2][0][0]);  
@@ -190,9 +190,7 @@ int reduce(SR_Automata *sra, Action action, Token input_token){
     // Push the new state after reduction
     push(&sra->stack, goto_action.state);
 
-    // Call it recursively in case there are more reduces to do before the next shift
-    int n = SRAutomata_step(sra, input_token); 
-    return n;
+    return REDUCE;
 }
 
 
@@ -200,7 +198,7 @@ int reduce(SR_Automata *sra, Action action, Token input_token){
 // Executes a step of the Shift-Reduce Automata
 int SRAutomata_step(SR_Automata *sra, Token input_token) {
     if (!sra) {
-        fprintf(stderr, "Error: SR_Automata pointer is NULL.\n");
+        printf("Error: SR_Automata pointer is NULL\n");
         exit(EXIT_FAILURE);
     }
 
@@ -217,17 +215,21 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
     switch (action.type) {
         case SHIFT:
             return shift(sra, action);
-            break;
-        
-        case REDUCE: {
+
+        case REDUCE: 
             return reduce(sra, action, input_token);
-            break;
-        }
         
         case ACCEPT:
-            printf("Input accepted.\n");
-            return ACCEPT;
-            break;
+            int num_accept =  sizeof(sra->automata.accepting_states)/sizeof(int);
+            for (int i = 0; i < num_accept; i++){
+                if (sra->automata.accepting_states[i] == state){
+                    printf("Input accepted!\n");
+                    return ACCEPT;
+                }
+            }
+            
+            printf("You tried to end in a state which is not an accepting state!\n");
+            return ERROR;
         
         case ERROR:
             printf("There has been an error in the parsing process!\nAt token '%s'", input_token.lexeme);
