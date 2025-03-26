@@ -5,7 +5,7 @@
 
 // Stack structure
 typedef struct {
-    int items[MAX_STACK];
+    int states[MAX_STACK];
     int top;
 } Stack;
 

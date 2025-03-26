@@ -11,7 +11,7 @@ void init_stack(Stack* stack) {
 void push(Stack* stack, int state) {
     if (stack->top < MAX_STACK - 1) {
         stack->top++;
-        stack->items[stack->top] = state;
+        stack->states[stack->top] = state;
     } else {
         printf("Error: Stack overflow!\n");
     }
@@ -20,7 +20,7 @@ void push(Stack* stack, int state) {
 int pop(Stack* stack) {
     if (stack->top >= 0) {
         stack->top--;
-        return stack->items[stack->top];
+        return stack->states[stack->top];
     }
     printf("Error: Stack underflow!\n");
     return -1;
@@ -29,7 +29,7 @@ int pop(Stack* stack) {
 // Peek function
 int peek(Stack* stack) {
     if (stack->top >= 0) {
-        return stack->items[stack->top];
+        return stack->states[stack->top];
     }
     printf("Error: Stack is empty!\n");
     return -1;
