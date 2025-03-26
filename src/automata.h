@@ -5,6 +5,7 @@
 #include "stack.h"
 #include "definition.h"
 
+#define DEBUGTOKEN ON
 #define MAX_RHSS 10
 // Production rule definition
 typedef struct {
@@ -67,7 +68,7 @@ void initSRAutomata(SR_Automata* automata);
 // Execution
 int SRAutomata_step(SR_Automata *SRAutomata, Token input_token);
 int shift(SR_Automata *sra, Action action);
-int reduce(SR_Automata *sra, Action action, Token input_token);
+int reduce(SR_Automata *sra, Action action);
 
 // Free memory functions
 void freeCFG(CFG *grammar);

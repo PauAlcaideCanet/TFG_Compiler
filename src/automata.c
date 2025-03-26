@@ -156,12 +156,17 @@ int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
 // Implementation of the shift action
 int shift(SR_Automata *sra, Action action){
     push(&sra->stack, action.state);
+
+    #if (DEBUGTOKEN == ON)
+        printf("The state %d has been shifted\n", action.state);
+    #endif
+
     return SHIFT;
 }
 
 
 
-int reduce(SR_Automata *sra, Action action, Token input_token){
+int reduce(SR_Automata *sra, Action action){
     // Fetch the rule to reduce 
     Production_rule rule = sra->grammar.rules[action.state];
 
@@ -190,6 +195,14 @@ int reduce(SR_Automata *sra, Action action, Token input_token){
     // Push the new state after reduction
     push(&sra->stack, goto_action.state);
 
+    #if (DEBUGTOKEN == ON)
+        printf("The reduce of the rule %s -> ", rule.lhs.lexeme);
+        for (int i = 0; i < rule.rhs_size; i++){
+            printf("%s ", rule.rhs[i].lexeme);
+        }
+        printf("has been aplied\n");
+    #endif
+
     return REDUCE;
 }
 
@@ -217,7 +230,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
             return shift(sra, action);
 
         case REDUCE: 
-            return reduce(sra, action, input_token);
+            return reduce(sra, action);
         
         case ACCEPT:
             int num_accept =  sizeof(sra->automata.accepting_states)/sizeof(int);
