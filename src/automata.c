@@ -126,7 +126,8 @@ void initSRAutomata(SR_Automata* sra) {
     initCFG(&sra->grammar);
     // Initialize the stack
     init_stack(&sra->stack);
-    push(&sra->stack, START_STATE); 
+    Token empty_token = (Token){-1, ""};
+    push(&sra->stack, START_STATE, empty_token); 
     // Initialize the automaton using the grammar
     initAutomata(&sra->grammar, &sra->automata);
 }
@@ -154,11 +155,11 @@ int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
 
 
 // Implementation of the shift action
-int shift(SR_Automata *sra, Action action){
-    push(&sra->stack, action.state);
+int shift(SR_Automata *sra, Action action, Token input_token){
+    push(&sra->stack, action.state, input_token);
 
     #if (DEBUGTOKEN == ON)
-        printf("The state %d has been shifted\n", action.state);
+        printf("The state %d and token <%s, %s> have been shifted\n", action.state, getCategoryFromToken(input_token), input_token.lexeme);
     #endif
 
     return SHIFT;
@@ -171,12 +172,17 @@ int reduce(SR_Automata *sra, Action action){
     Production_rule rule = sra->grammar.rules[action.state];
 
     // Pop the RHS symbols from the stack
+    StackItem items[MAX_RHSS];
     for (int i = 0; i < rule.rhs_size; i++) {
-        pop(&sra->stack);
+        items[i] = pop(&sra->stack);
     }
 
+    /* ==========================
+    Aqui va la generació del AST
+    =============================*/
+
     // Get the current state after popping
-    int new_state = peek(&sra->stack);
+    int new_state = peek(&sra->stack).state;
     
     // Find the column index of the LHS in the automaton's alphabet
     int lhs_column = getColumn(rule.lhs, sra->automata.alphabet, sra->automata.num_symbols);
@@ -193,7 +199,7 @@ int reduce(SR_Automata *sra, Action action){
     }
 
     // Push the new state after reduction
-    push(&sra->stack, goto_action.state);
+    push(&sra->stack, goto_action.state, rule.lhs);
 
     #if (DEBUGTOKEN == ON)
         printf("The reduce of the rule %s -> ", rule.lhs.lexeme);
@@ -215,7 +221,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
         exit(EXIT_FAILURE);
     }
 
-    int state = peek(&sra->stack);
+    int state = peek(&sra->stack).state;
     int column = getColumn(input_token, sra->automata.alphabet, sra->automata.num_symbols);
 
     if (column == -1) {
@@ -227,7 +233,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
 
     switch (action.type) {
         case SHIFT:
-            return shift(sra, action);
+            return shift(sra, action, input_token);
 
         case REDUCE: 
             return reduce(sra, action);

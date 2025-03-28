@@ -8,29 +8,32 @@ void init_stack(Stack* stack) {
 }
 
 
-void push(Stack* stack, int state) {
+void push(Stack* stack, int state, Token token) {
     if (stack->top < MAX_STACK - 1) {
         stack->top++;
-        stack->states[stack->top] = state;
+        stack->items[stack->top].state = state;
+        stack->items[stack->top].token = token;
     } else {
         printf("Error: Stack overflow!\n");
     }
 }
 
-int pop(Stack* stack) {
+StackItem pop(Stack* stack) {
     if (stack->top >= 0) {
         stack->top--;
-        return stack->states[stack->top];
+        return stack->items[stack->top];
     }
     printf("Error: Stack underflow!\n");
-    return -1;
+    StackItem error_item = { -1, { -1, "ERROR" } };
+    return error_item;
 }
 
 // Peek function
-int peek(Stack* stack) {
+StackItem peek(Stack* stack) {
     if (stack->top >= 0) {
-        return stack->states[stack->top];
+        return stack->items[stack->top];
     }
     printf("Error: Stack is empty!\n");
-    return -1;
+    StackItem error_item = { -1, { -1, "ERROR" } };
+    return error_item;
 }
