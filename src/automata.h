@@ -1,3 +1,18 @@
+/*=========================================================================================
+
+This file contains the structures of Production rules, Context-free Grammar, Alphabet symbol,
+Action, Automata and Shift-Reduce Automata. Also contains the enumeration of the different 
+actions that can happen in the transition table.
+
+Also contains the declaration of the functions to initialize these structures and to free
+their memory.abort
+
+Finally the declaration of function to perform a step of a Shift-Reduce Automaton as well as the shift and 
+the reduce functions.
+
+Made by Pau Alcaide Canet
+===========================================================================================*/
+
 #ifndef AUTOMATA_H
 #define AUTOMATA_H
 
@@ -5,7 +20,11 @@
 #include "stack.h"
 #include "definition.h"
 
+/*========================================================================================*/
+/*------------- When enabled (ON) it shows the operations done by the parser -------------*/
 #define DEBUGTOKEN ON
+/*========================================================================================*/
+
 #define MAX_RHSS 10
 // Production rule definition
 typedef struct {

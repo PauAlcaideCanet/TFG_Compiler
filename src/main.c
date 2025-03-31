@@ -32,10 +32,7 @@ int main() {
         if (step == SHIFT){
             freeToken(&tokens[i]);
             i++;
-        }else if (step == ERROR){
-            printf("There has been an error while parsing\n");
         }
-        
     }
 
     //Free the memory
