@@ -67,7 +67,7 @@ void initSRAutomata(SR_Automata* automata);
 
 // Execution
 int SRAutomata_step(SR_Automata *SRAutomata, Token input_token);
-int shift(SR_Automata *sra, Action action);
+int shift(SR_Automata *sra, Action action, Token input_token);
 int reduce(SR_Automata *sra, Action action);
 
 // Free memory functions
