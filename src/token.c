@@ -1,3 +1,11 @@
+/*====================================================================================================
+
+This file contains the implementation of the functions to create, free, print and get information
+from the tokens.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
+
 #include <stdio.h>
 
 #include "token.h"

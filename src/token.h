@@ -1,9 +1,12 @@
-/*
-* Here is where the Token structure is defined. 
-* The token is defined as a structure of a type and a value. The types can be found in the TokenTypes enumeration.
-*
-* Made by Pau Alcaide Canet 
-*/
+/*====================================================================================================
+
+This file contains the structure of the Token as well as the enumeration of the different categories 
+that tokens can have.
+
+Also the declaration of the functions to create, free a token and some utility functions for tokens.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
 
 #ifndef TOKEN_H
 #define TOKEN_H

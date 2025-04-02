@@ -1,7 +1,8 @@
 #include "node.h"
+#include "automata.h"
 
 // Create an Integer Node
-IntNode *createIntegerNode(int value) {
+IntNode *createIntegerNode(char* value) {
     IntNode *node = (IntNode *)malloc(sizeof(IntNode));
     node->base.type = NODE_INTEGER;
     node->value = value;
@@ -28,27 +29,6 @@ GroupingNode *createGroupingNode(Expression *expression) {
     return node;
 }
 
-<<<<<<< Updated upstream
-=======
-//--------------------------------NO FUNCIONA REVISAR---------------------------------------
-void newNode(AST ast, Production_rule rule, Token token){
-    if (rule.rhs_size == 1 && rule.rhs[0].category == T_INT) {
-        // Rule: T → NUM
-        //createIntegerNode(token.lexeme);
-
-    } else if (rule.rhs_size == 3 && rule.rhs[1].category == T_SUM) {
-        // Rule: E → E + T (or E * T)
-        //createBinaryOperationNode();
-
-    } else {
-        printf("Error: Unrecognized production rule!\n");
-    }
-}
-
-void initAST(AST *ast) {
-    ast->root = NULL; 
-}
->>>>>>> Stashed changes
 
 
 // Print AST (Recursive)

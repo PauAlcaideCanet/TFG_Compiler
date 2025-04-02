@@ -3,12 +3,17 @@
 #include "automata.h"
 #include "token.h"
 #include "stack.h"
+#include "node.h"
 
 int main() {
     
     // Create the automata and initializate it
     SR_Automata sra;
     initSRAutomata(&sra);
+
+    //Create the Abstract Syntax Tree
+    AST tree;
+    initAST(&tree);
 
     // List of tokens to parse
     Token tokens[] = {
@@ -32,14 +37,16 @@ int main() {
         if (step == SHIFT){
             freeToken(&tokens[i]);
             i++;
-        }else if (step == ERROR){
-            printf("There has been an error while parsing\n");
         }
-        
     }
+
+    //Print the Abstract Syntax Tree
+    printf("\nThe tree is:\n");
+    printAST(tree.root);
 
     //Free the memory
     freeSR_Automata(&sra);
+    freeAST(tree.root);
     
     return 0; 
 }

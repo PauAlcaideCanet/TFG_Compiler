@@ -46,4 +46,12 @@ typedef struct {
     Expression *root;  // Root of the AST
 } AST;
 
+
+IntNode *createIntegerNode(char* value);
+BinaryOperationNode *createBinaryOperationNode(char operation, Expression *lhs, Expression *rhs);
+GroupingNode *createGroupingNode(Expression *expression);
+void initAST(AST *ast);
+void printAST(Expression *node);
+void freeAST(Expression *node);
+
 #endif // NODE_H

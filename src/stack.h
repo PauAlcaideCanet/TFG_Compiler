@@ -1,3 +1,12 @@
+/*====================================================================================================
+
+This file contains the structure of the Stack and the items it keeps.
+
+Also the declaration of the basic stack functions (init, push, pop and peek) with this stack version.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
+
 #ifndef STACK_H
 #define STACK_H
 

@@ -1,3 +1,15 @@
+/*====================================================================================================
+
+This file contains the implementation of the functions to initialize the structures of Production rules, 
+Context-free Grammar, Alphabet symbol, Action, Automata and Shift-Reduce Automata and to free
+their memory.
+
+Finally the implementation of the function to perform a step of a Shift-Reduce Automaton as well as 
+the shift and the reduce functions.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
+
 #include <stdio.h>
 #include "token.h"
 #include "stack.h"
@@ -175,6 +187,11 @@ int reduce(SR_Automata *sra, Action action){
     StackItem items[MAX_RHSS];
     for (int i = 0; i < rule.rhs_size; i++) {
         items[i] = pop(&sra->stack);
+        if (items[i].token.category != rule.rhs[rule.rhs_size-i-1].category){
+            printf("There has been an error in the parsing process:\n");
+            printf("The token popped (%s) does not match with the rule one (%s)\n",
+                getCategoryFromToken(items[i].token),getCategoryFromToken(rule.rhs[rule.rhs_size-i-1]));
+        }
     }
 
     /* ==========================
@@ -251,7 +268,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
             return ERROR;
         
         case ERROR:
-            printf("There has been an error in the parsing process!\nAt token '%s'", input_token.lexeme);
+            printf("There has been an error in the parsing process a token '%s'!\n", input_token.lexeme);
             return ERROR;
         default:
             printf("Syntax error at token '%s'.\n", input_token.lexeme);

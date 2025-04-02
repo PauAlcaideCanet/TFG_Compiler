@@ -1,6 +1,10 @@
-/*
+/*====================================================================================================
 
-*/
+This file contains an example on how to provide the necessary information to initialize a 
+Shift-Reduce Automaton.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
 
 #define NUM_GRAMMAR 1
 
