@@ -10,9 +10,6 @@ the shift and the reduce functions.
 Made by Pau Alcaide Canet
 ====================================================================================================*/
 
-#include <stdio.h>
-#include "token.h"
-#include "stack.h"
 #include "automata.h"
 
 // Get the Rules from its definition
@@ -144,6 +141,40 @@ void initSRAutomata(SR_Automata* sra) {
     initAutomata(&sra->grammar, &sra->automata);
 }
 
+// When there is a Reduce step, build the AST 
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens){
+    
+    // Create the supernode for the LHS token
+    Node *lhsNode = createTreeNode(rule.lhs);
+
+    // Iterate over the RHS tokens
+    for (int i = 0; i < rule.rhs_size; ++i) {
+        Token token = rhsTokens[i].token;
+
+        //Create the child node
+        Node *child = NULL;
+
+        printf("Hey!, The first element in the rhs is %s\n", rhsTokens[0].token.lexeme);
+        if (token.category == T_NON_TERMINAL) {
+            // Pop node from stack (previous subtree)
+            child = pop_node(nodeStack);
+            if (!child) {
+                printf("Error: Stack underflow when handling non-terminal.\n");
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            printf("I have reached here :)\n");
+            // Create a new node for the terminal token
+            child = createTreeNode(token);
+        }
+
+        addChild(lhsNode, child);
+    }
+
+    // Push the newly built subtree (lhsNode) onto the stack
+    push_node(nodeStack, lhsNode);
+
+}
 
 
 // Returns the associated column for the introduced token 
@@ -179,7 +210,7 @@ int shift(SR_Automata *sra, Action action, Token input_token){
 
 
 
-int reduce(SR_Automata *sra, Action action){
+int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     // Fetch the rule to reduce 
     Production_rule rule = sra->grammar.rules[action.state];
 
@@ -194,9 +225,8 @@ int reduce(SR_Automata *sra, Action action){
         }
     }
 
-    /* ==========================
-    Aqui va la generació del AST
-    =============================*/
+    // Generation of the AST
+    buildNodeFromRule(rule, stackNode, items);
 
     // Get the current state after popping
     int new_state = peek(&sra->stack).state;
@@ -232,7 +262,7 @@ int reduce(SR_Automata *sra, Action action){
 
 
 // Executes a step of the Shift-Reduce Automata
-int SRAutomata_step(SR_Automata *sra, Token input_token) {
+int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
     if (!sra) {
         printf("Error: SR_Automata pointer is NULL\n");
         exit(EXIT_FAILURE);
@@ -253,7 +283,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
             return shift(sra, action, input_token);
 
         case REDUCE: 
-            return reduce(sra, action);
+            return reduce(sra, action, stackNode);
         
         case ACCEPT:
             int num_accept =  sizeof(sra->automata.accepting_states)/sizeof(int);

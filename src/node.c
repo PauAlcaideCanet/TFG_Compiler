@@ -1,103 +1,60 @@
 #include "node.h"
-#include "automata.h"
 
-// Create an Integer Node
-IntNode *createIntegerNode(char* value) {
-    IntNode *node = (IntNode *)malloc(sizeof(IntNode));
-    node->base.type = NODE_INTEGER;
-    node->value = value;
+// Create a new TreeNode from a Token
+Node* createTreeNode(Token token) {
+    Node* node = (Node*) malloc(sizeof(Node));
+    if (node != NULL) {
+        node->token = token;
+        node->children = NULL;
+    }
     return node;
 }
 
-
-// Create a Binary Operation Node
-BinaryOperationNode *createBinaryOperationNode(char operation, Expression *lhs, Expression *rhs) {
-    BinaryOperationNode *node = (BinaryOperationNode *)malloc(sizeof(BinaryOperationNode));
-    node->base.type = NODE_BINARY_OPERATION;
-    node->operation = operation;
-    node->lhs = lhs;
-    node->rhs = rhs;
-    return node;
+// Add a child to a node
+void addChild(Node *parent, Node *child) {
+    Node_children *newChild = (Node_children*) malloc(sizeof(Node_children));
+    if (newChild != NULL) {
+        newChild->child = child;
+        newChild->next = parent->children;
+        parent->children = newChild;
+    }
 }
 
+void freeTree(Node *root) {
+    if (root == NULL) return;
 
-// Create a Grouping Node
-GroupingNode *createGroupingNode(Expression *expression) {
-    GroupingNode *node = (GroupingNode *)malloc(sizeof(GroupingNode));
-    node->base.type = NODE_GROUPING;
-    node->expression = expression;
-    return node;
+    Node_children *current = root->children;
+    while (current != NULL) {
+        Node_children *next = current->next;
+        freeTree(current->child);   
+        free(current);              
+        current = next;
+    }
+
+    freeToken(&root->token);         
+    free(root);                     
 }
 
-//--------------------------------NO FUNCIONA REVISAR---------------------------------------
-void newNode(AST ast, Production_rule rule, Token token){
-    if (rule.rhs_size == 1 && rule.rhs[0].category == T_INT) {
-        // Rule: T → NUM
-        createIntegerNode(token.lexeme);
+void printTree(Node *root, int white) {
+    if (root == NULL) return;
 
-    } else if (rule.rhs_size == 3 && rule.rhs[1].category == T_SUM) {
-        // Rule: E → E + T (or E * T)
-        createBinaryOperationNode();
+    // Print whitespace
+    for (int i = 0; i < white; ++i) {
+        printf("  ");
+    }
 
+    // Print token info
+    if (root->token.lexeme != NULL) {
+        printf("%s\n", root->token.lexeme);
     } else {
-        printf("Error: Unrecognized production rule!\n");
+        printf("[category: %d]\n", root->token.category);  
+    }
+
+    // Recurse into children
+    Node_children *current = root->children;
+    while (current != NULL) {
+        printTree(current->child, white + 1);
+        current = current->next;
     }
 }
 
-void initAST(AST *ast) {
-    ast->root = NULL; 
-}
-
-
-// Print AST (Recursive)
-void printAST(Expression *node) {
-    if (!node) return;
-
-    switch (node->type) {
-        case NODE_INTEGER:
-            printf("%d", ((IntNode *)node)->value);
-            break;
-
-        case NODE_BINARY_OPERATION: {
-            BinaryOperationNode *binOp = (BinaryOperationNode *)node;
-            printf("(");
-            printAST(binOp->lhs);
-            printf(" %c ", binOp->operation);
-            printAST(binOp->rhs);
-            printf(")");
-            break;
-
-        }
-        case NODE_GROUPING: {
-            GroupingNode *group = (GroupingNode *)node;
-            printf("(");
-            printAST(group->expression);
-            printf(")");
-            break;
-
-        }
-    }
-}
-
-
-
-void freeAST(Expression *node) {
-    if (!node) return;
-
-    switch (node->type) {
-        case NODE_BINARY_OPERATION:
-            freeAST(((BinaryOperationNode *)node)->lhs);
-            freeAST(((BinaryOperationNode *)node)->rhs);
-            break;
-
-        case NODE_GROUPING:
-            freeAST(((GroupingNode *)node)->expression);
-            break;
-
-        case NODE_INTEGER:
-            break;
-
-    }
-
-    free(node);
-}

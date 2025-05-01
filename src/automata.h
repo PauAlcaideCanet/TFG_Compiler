@@ -16,9 +16,12 @@ Made by Pau Alcaide Canet
 #ifndef AUTOMATA_H
 #define AUTOMATA_H
 
+#include <stdio.h>
 #include "token.h"
 #include "stack.h"
 #include "definition.h"
+#include "node_stack.h"
+#include "node.h"
 
 /*========================================================================================*/
 /*------------- When enabled (ON) it shows the operations done by the parser -------------*/
@@ -76,7 +79,8 @@ typedef struct {
     CFG grammar;              
 } SR_Automata;
 
-
+// Get the production rules
+Production_rule* getProductionRules();
 
 // Initialization functions
 void initCFG(CFG *grammar);
@@ -84,17 +88,18 @@ void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet);
 void initAutomata(const CFG *grammar, Automata* automata);
 void initSRAutomata(SR_Automata* automata);
 
+//AST Node creator
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens);
+
 // Execution
-int SRAutomata_step(SR_Automata *SRAutomata, Token input_token);
+int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);
 int shift(SR_Automata *sra, Action action, Token input_token);
-int reduce(SR_Automata *sra, Action action);
+int reduce(SR_Automata *sra, Action action, NodeStack* stackNode);
+int SRAutomata_step(SR_Automata *SRAutomata, Token input_token, NodeStack* stackNode);
 
 // Free memory functions
 void freeCFG(CFG *grammar);
 void freeAutomata(Automata *automata);
 void freeSR_Automata(SR_Automata *SRAutomata);
 
-//Getters
-int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);
-Production_rule* getProductionRules();
 #endif

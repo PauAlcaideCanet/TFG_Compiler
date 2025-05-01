@@ -8,50 +8,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-// Enumeration of the Type of nodes in the Abstract syntax tree
-typedef enum {
-    NODE_INTEGER,
-    NODE_BINARY_OPERATION,
-    NODE_GROUPING
-} NodeType;
-
-// Base expression structure
-typedef struct Expression {
-    NodeType type;
-} Expression;
-
-// Integer Node
-typedef struct {
-    Expression base;
-    int value;
-} IntNode;
-
-// Binary Operation Node (sum, mult, ...)
-typedef struct {
-    Expression base;
-    char operation;     // '+' or '*'
-    Expression *lhs;
-    Expression *rhs;
-} BinaryOperationNode;
-
-// Grouping Node (for parenthesis)
-typedef struct {
-    Expression base;
-    Expression *expression;
-} GroupingNode;
-
-// AST Root Structure
-typedef struct {
-    Expression *root;  // Root of the AST
-} AST;
+#include "token.h"
 
 
-IntNode *createIntegerNode(char* value);
-BinaryOperationNode *createBinaryOperationNode(char operation, Expression *lhs, Expression *rhs);
-GroupingNode *createGroupingNode(Expression *expression);
-void initAST(AST *ast);
-void printAST(Expression *node);
-void freeAST(Expression *node);
+typedef struct Node Node;
+
+// Children of the node
+typedef struct Node_children {
+    Node *child;
+    struct Node_children *next;
+} Node_children;
+
+// Tree node
+struct Node {
+    Token token;
+    Node_children *children;
+};
+
+
+Node* createTreeNode(Token token);
+void addChild(Node *parent, Node *child);
+void freeTree(Node *root);
+void printTree(Node *root, int indent);
+
 
 #endif // NODE_H

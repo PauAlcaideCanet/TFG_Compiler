@@ -4,6 +4,10 @@
 #include "token.h"
 #include "stack.h"
 #include "node.h"
+#include "node_stack.h"
+
+// Putting GEN_TREE to ON makes the program print the tree
+#define GEN_TREE ON
 
 int main() {
     
@@ -11,9 +15,10 @@ int main() {
     SR_Automata sra;
     initSRAutomata(&sra);
 
-    //Create the Abstract Syntax Tree
-    AST tree;
-    initAST(&tree);
+    //Create stack for the creation of the AST
+    NodeStack AST;
+    initNodeStack(&AST);
+
 
     // List of tokens to parse
     Token tokens[] = {
@@ -32,7 +37,7 @@ int main() {
     int i = 0;
     while (i < num_tokens && step != ERROR && step != ACCEPT) {
 
-        step = SRAutomata_step(&sra, tokens[i]);
+        step = SRAutomata_step(&sra, tokens[i], &AST);
 
         if (step == SHIFT){
             freeToken(&tokens[i]);
@@ -40,13 +45,17 @@ int main() {
         }
     }
 
-    //Print the Abstract Syntax Tree
-    printf("\nThe tree is:\n");
-    printAST(tree.root);
+    #if (GEN_TREE == ON)
+        //Print the Abstract Syntax Tree
+        printf("\nThe tree is:\n");
 
+        Node* root = peek_node(&AST);
+        printTree(root, 0);
+    #endif
+    
     //Free the memory
     freeSR_Automata(&sra);
-    freeAST(tree.root);
+    freeTree(root);
     
     return 0; 
 }
