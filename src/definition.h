@@ -15,17 +15,18 @@ Made by Pau Alcaide Canet
     #define NUM_NON_TERMINALS 4
     #define NON_TERMINALS {"S", "E", "T", "F"} 
     #define NUM_RULES 7
-    #define PROD_RULES {    {{"T_NON_TERMINAL", "S"}, {{"T_NON_TERMINAL","E"}, {"T_EOF", ""}}, "2"}                             /*-Rule 0-*/, \
-                            {{"T_NON_TERMINAL", "E"}, {{"T_NON_TERMINAL", "E"}, {"T_SUM", "+"}, {"T_NON_TERMINAL", "T"}}, "3"}    /*-Rule 1-*/, \
-                            {{"T_NON_TERMINAL", "E"}, {{"T_NON_TERMINAL", "T"}}, "1"}                                         /*-Rule 2-*/, \
-                            {{"T_NON_TERMINAL", "T"}, {{"T_NON_TERMINAL", "T"}, {"T_MULT", "*"}, {"T_NON_TERMINAL", "F"}}, "3"}   /*-Rule 3-*/, \
-                            {{"T_NON_TERMINAL", "T"}, {{"T_NON_TERMINAL", "F"}}, "1"}                                         /*-Rule 4-*/, \
-                            {{"T_NON_TERMINAL", "F"}, {{"T_OPEN_PAR", "("}, {"T_NON_TERMINAL", "E"}, {"T_CLOSE_PAR", ")"}}, "3"}  /*-Rule 5-*/, \
-                            {{"T_NON_TERMINAL", "F"}, {{"T_INT", "NUM" }}, "1"}                                                   /*-Rule 6-*/, \
+    #define PROD_RULES {    {{"T_NON_TERMINAL", "S"}, {{"T_NON_TERMINAL","E"}, {"T_EOF", ""}}, "2"}                                 /*-Rule 0-*/, \
+                            {{"T_NON_TERMINAL", "E"}, {{"T_NON_TERMINAL", "E"}, {"T_SUM", "+"}, {"T_NON_TERMINAL", "T"}}, "3"}      /*-Rule 1-*/, \
+                            {{"T_NON_TERMINAL", "E"}, {{"T_NON_TERMINAL", "T"}}, "1"}                                               /*-Rule 2-*/, \
+                            {{"T_NON_TERMINAL", "T"}, {{"T_NON_TERMINAL", "T"}, {"T_MULT", "*"}, {"T_NON_TERMINAL", "F"}}, "3"}     /*-Rule 3-*/, \
+                            {{"T_NON_TERMINAL", "T"}, {{"T_NON_TERMINAL", "F"}}, "1"}                                               /*-Rule 4-*/, \
+                            {{"T_NON_TERMINAL", "F"}, {{"T_OPEN_PAR", "("}, {"T_NON_TERMINAL", "E"}, {"T_CLOSE_PAR", ")"}}, "3"}    /*-Rule 5-*/, \
+                            {{"T_NON_TERMINAL", "F"}, {{"T_INT", "NUM" }}, "1"}                                                     /*-Rule 6-*/, \
     }
+    #define START_STATE 0
     #define NUM_STATES 12
     #define ACCEPT_STATES {1}
-    #define START_STATE 0
+    
 
     //The columns are placed TERMINALS-NON_TERMINALS in the same order than above
     // La part del float no està implementat encara

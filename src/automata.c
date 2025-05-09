@@ -74,7 +74,7 @@ void initCFG(CFG *grammar) {
 
 
 // Alphabet initialization
-void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { //Funciona
+void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { 
     int index = 0;
     // Fill the terminals into the alphabet
     for (int i = 0; i < grammar->num_terminals; i++) {
@@ -95,14 +95,14 @@ void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { //Funciona
 
 
 // Automata initialization
-void initAutomata(const CFG *grammar, Automata* automata) {     //Aixo està bé
+void initAutomata(const CFG *grammar, Automata* automata) {     
     //Init the Alphabet
     automata->num_symbols = grammar->num_terminals + grammar->num_non_terminals;
     automata->alphabet = malloc(automata->num_symbols * sizeof(Alphabet_symbol));
     initAlphabet(grammar, automata->alphabet);
 
-    automata->num_states = NUM_STATES;
     automata->start_state = START_STATE;
+    automata->num_states = NUM_STATES;
 
     //Init the accepting states
     int accept_states[] = ACCEPT_STATES;  
@@ -133,12 +133,14 @@ void initSRAutomata(SR_Automata* sra) {
     }
     // Initialize the context-free grammar (CFG)
     initCFG(&sra->grammar);
+    
+    // Initialize the automaton using the grammar
+    initAutomata(&sra->grammar, &sra->automata);
+
     // Initialize the stack
     init_stack(&sra->stack);
     Token empty_token = (Token){-1, ""};
-    push(&sra->stack, START_STATE, empty_token); 
-    // Initialize the automaton using the grammar
-    initAutomata(&sra->grammar, &sra->automata);
+    push(&sra->stack, sra->automata.start_state, empty_token); 
 }
 
 // When there is a Reduce step, build the AST 
