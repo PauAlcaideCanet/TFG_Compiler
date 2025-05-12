@@ -60,6 +60,7 @@
     "stack.h": "c",
     "stdio.h": "c",
     "cstdlib": "c",
-    "automata.h": "c"
+    "automata.h": "c",
+    "definition.h": "c"
   }
 }

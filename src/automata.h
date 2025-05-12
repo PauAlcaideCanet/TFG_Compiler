@@ -24,11 +24,18 @@ Made by Pau Alcaide Canet
 #include "node.h"
 
 /*========================================================================================*/
+/*------------- When enabled (ON) it shows information caught when reading from the input file -------------*/
+#define DEBUG_RF ON
+/*========================================================================================*/
+
+
+/*========================================================================================*/
 /*------------- When enabled (ON) it shows the operations done by the parser -------------*/
 #define DEBUGTOKEN ON
 /*========================================================================================*/
 
 #define MAX_RHSS 10
+#define MAX_LINE_LENGHT 256
 // Production rule definition
 typedef struct {
     Token lhs;      // Left hand side
@@ -79,14 +86,21 @@ typedef struct {
     CFG grammar;              
 } SR_Automata;
 
-// Get the production rules
-Production_rule* getProductionRules();
+//Printers
+void printProductionRule(Production_rule rule);
+
+//Getters
+int getNum(FILE* file, const char* title);
+char** getCharList(FILE* file, const char* title, int num_items);
+Production_rule* getProductionRules(FILE* file);
+int* getIntList(FILE* file, const char* title, int num_items);
+Action** getTransitions(FILE* file);
 
 // Initialization functions
-void initCFG(CFG *grammar);
+void initCFG(CFG *grammar, FILE* file);
 void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet);
-void initAutomata(const CFG *grammar, Automata* automata);
-void initSRAutomata(SR_Automata* automata);
+void initAutomata(const CFG *grammar, Automata* automata, FILE* file);
+void initSRAutomata(SR_Automata* automata, FILE* file);
 
 //AST Node creator
 void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens);

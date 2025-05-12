@@ -16,7 +16,7 @@ void printToken(Token token) {
         "T_INT", "T_FLOAT", "T_OPEN_PAR", "T_CLOSE_PAR",
         "T_SUM", "T_MULT", "T_EOF", "T_NON_TERMINAL"
     };
-    printf("<%s, %s>\n", tokenNames[token.category], token.lexeme);
+    printf("<%s, %s>", tokenNames[token.category], token.lexeme);
 }
 
 Token createToken(TokenType type, const char *lexeme) {
@@ -50,7 +50,7 @@ TokenType getTokenCategory(const char* type_str) {
     if (strcmp(type_str, "T_EOF") == 0) return T_EOF;
     if (strcmp(type_str, "T_NON_TERMINAL") == 0) return T_NON_TERMINAL;
     
-    fprintf(stderr, "Unknown token type: %s\n", type_str);
+    printf("Unknown token type: %s\n", type_str);
     exit(EXIT_FAILURE);
 }
 

@@ -11,9 +11,15 @@
 
 int main() {
     
+    //Open input file
+    FILE *file = fopen("input.txt", "r");  // Replace with your actual file path
+    if (!file) {
+        printf("Failed to open file\n");
+    }
+
     // Create the automata and initializate it
     SR_Automata sra;
-    initSRAutomata(&sra);
+    initSRAutomata(&sra, file);
 
     //Create stack for the creation of the AST
     NodeStack AST;
