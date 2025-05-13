@@ -88,13 +88,14 @@ typedef struct {
 
 //Printers
 void printProductionRule(Production_rule rule);
+void printAction(Action action);
 
 //Getters
 int getNum(FILE* file, const char* title);
 char** getCharList(FILE* file, const char* title, int num_items);
 Production_rule* getProductionRules(FILE* file);
 int* getIntList(FILE* file, const char* title, int num_items);
-Action** getTransitions(FILE* file);
+Action** getTransitions(FILE* file, int num_states, int num_terms);
 
 // Initialization functions
 void initCFG(CFG *grammar, FILE* file);

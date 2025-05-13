@@ -1,25 +1,16 @@
-# Makefile for Shift-Reduce Automata Parser (Windows)
-
 CC = gcc
-CFLAGS = -Wall -Wextra -g
-OBJ = token.o stack.o automata.o main.o
-EXEC = parser.exe
+CFLAGS = -Wall -g
 
-# Default rule
-all: $(EXEC)
+SRC = token.c stack.c node.c stack_node.c automata.c main.c
+OBJ = $(SRC:.c=.o)
 
-# Build the executable
-$(EXEC): $(OBJ)
-	$(CC) $(CFLAGS) -o $(EXEC) $(OBJ)
+all: main
 
-# Compile object files
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+main: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
-# Clean compiled files (Windows version)
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 clean:
-	del /Q $(OBJ) $(EXEC)
-
-# Run the parser (Windows version)
-run: $(EXEC)
-	$(EXEC)
+	rm -f $(OBJ) main

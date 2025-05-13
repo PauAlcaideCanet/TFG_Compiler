@@ -25,6 +25,16 @@ void printProductionRule(Production_rule rule) {
     printf("\n");
 }
 
+void printAction(Action action){
+    char* type;
+    if (action.type == 0) type = "SHIFT";
+    else if (action.type == 1) type = "REDUCE";
+    else if (action.type == 2) type = "ACCEPT";
+    else type = "ERROR";
+
+    printf("<%s, %d>",type, action.state);
+}
+
 /*============== GETTERS SECTION ======================*/
 // In this section the functions that extract the information from the input file are found.
 
@@ -276,8 +286,75 @@ int *getIntList(FILE *file, const char* title, int num_items){
 }
 
 
-Action **getTransitions(FILE *file){
-    return NULL;
+Action **getTransitions(FILE *file, int num_states, int num_terms){
+    char line[MAX_LINE_LENGHT];
+    rewind(file);
+
+    // Allocate memory for all the table
+    Action **table = malloc(num_states * sizeof(Action *));
+    if (!table) {
+        fprintf(stderr, "Memory allocation failed for transitions table\n");
+        return NULL;
+    }
+
+    for (int i = 0; i < num_states; i++) {
+        table[i] = malloc(num_terms * sizeof(Action));
+        if (!table[i]) {
+            fprintf(stderr, "Memory allocation failed for row %d\n", i);
+            return NULL;
+        }
+    }
+
+    // To remember in which state are we
+    int state_index = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "TRANSITIONS", 11) == 0) break; // Go to transitions
+    }
+
+    while (fgets(line, sizeof(line), file) && state_index < num_states) {
+        //Remove whitespaces and tabulations at the beginning
+        char *ptr = line;
+        while (*ptr && (*ptr == ' ' || *ptr == '\t')) ptr++;
+
+        char action_type[16];
+        int number;
+
+        for (int i = 0; i < num_terms; i++) {
+            // Put the info in the txt to the variables
+            if (sscanf(ptr, "{%[^,], %d}", action_type, &number) != 2) {
+                fprintf(stderr, "Error parsing action at state %d, terminal %d\n", state_index, i);
+                break;
+            }
+            
+            // Match the string with the ActionType and put it in the table
+            if (strcmp(action_type, "SHIFT") == 0) table[state_index][i].type = SHIFT;
+            else if (strcmp(action_type, "REDUCE") == 0) table[state_index][i].type = REDUCE;
+            else if (strcmp(action_type, "ACCEPT") == 0) table[state_index][i].type = ACCEPT;
+            else table[state_index][i].type = ERROR;
+
+            table[state_index][i].state = number;
+
+            // Move ptr past this action
+            ptr = strchr(ptr, '}');
+            if (ptr) ptr+=2; // skip to next
+        }
+
+        state_index++;
+    }
+
+    #if (DEBUG_RF == ON)
+        printf("Reading from the file: TRANSITIONS:\n");
+        for (int i = 0; i < num_states; i++){
+            for(int j = 0; j< num_terms; j++){
+                printAction(table[i][j]);
+                printf(", ");
+            }
+            printf("\n");
+        }
+    #endif
+
+    return table;
 }
 
 // Initialization of the Context-Free Grammar
@@ -348,7 +425,11 @@ void initAutomata(const CFG *grammar, Automata* automata, FILE* file) {
     int num_accept_states = getNum(file, "NUM_ACCEPT_STATES");
     automata->accepting_states = getIntList(file, "ACCEPT_STATES" ,num_accept_states);  
 
-    //Init the Transitions
+    //Init the Transitions and put them into the automata struct
+    Action** actionTable = getTransitions(file, automata->num_states, automata->num_symbols);
+    automata->transition_table = actionTable;
+
+    /*
     static Action transition_data[NUM_STATES][NUM_TERMINALS + NUM_NON_TERMINALS] = TRANSITIONS;
     automata->transition_table = malloc(NUM_STATES * sizeof(Action*));
  
@@ -358,9 +439,8 @@ void initAutomata(const CFG *grammar, Automata* automata, FILE* file) {
             automata->transition_table[i][j] = transition_data[i][j];
         }
     }
+    */
 }
-
-
 
 // Shift-Reduce Automata initialization
 void initSRAutomata(SR_Automata* sra, FILE* file) {
