@@ -21,12 +21,14 @@ typedef struct Node_children {
 
 // Tree node
 struct Node {
+    int id;
+    int rule_num;
     Token token;
     Node_children *children;
 };
 
 
-Node* createTreeNode(Token token);
+Node* createTreeNode(Token token, int rule);
 void addChild(Node *parent, Node *child);
 void freeTree(Node *root);
 void printTree(Node *root, int indent);

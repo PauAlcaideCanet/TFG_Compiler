@@ -104,7 +104,7 @@ void initAutomata(const CFG *grammar, Automata* automata, FILE* file);
 void initSRAutomata(SR_Automata* automata, FILE* file);
 
 //AST Node creator
-void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens);
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num);
 
 // Execution
 int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);

@@ -1,9 +1,13 @@
 #include "node.h"
 
 // Create a new TreeNode from a Token
-Node* createTreeNode(Token token) {
+Node* createTreeNode(Token token, int rule) {
+    static int current_id = 0;  // Keeps track of the next ID
+
     Node* node = (Node*) malloc(sizeof(Node));
     if (node != NULL) {
+        node->id = current_id++;  // Assign and increment the ID
+        node->rule_num = rule;     
         node->token = token;
         node->children = NULL;
     }
@@ -42,6 +46,8 @@ void printTree(Node *root, int white) {
     for (int i = 0; i < white; ++i) {
         printf("  ");
     }
+
+    printf("%d: ", root->id);
 
     // Print token info
     if (root->token.lexeme != NULL) {

@@ -462,10 +462,9 @@ void initSRAutomata(SR_Automata* sra, FILE* file) {
 }
 
 // When there is a Reduce step, build the AST 
-void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens){
-    
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num){
     // Create the supernode for the LHS token
-    Node *lhsNode = createTreeNode(rule.lhs);
+    Node *lhsNode = createTreeNode(rule.lhs, rule_num);
 
     // Iterate over the RHS tokens
     for (int i = 0; i < rule.rhs_size; ++i) {
@@ -483,7 +482,7 @@ void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rh
             }
         } else {
             // Create a new node for the terminal token
-            child = createTreeNode(token);
+            child = createTreeNode(token, -1);
         }
 
         addChild(lhsNode, child);
@@ -544,7 +543,7 @@ int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     }
 
     // Generation of the AST
-    buildNodeFromRule(rule, stackNode, items);
+    buildNodeFromRule(rule, stackNode, items, action.state);
 
     // Get the current state after popping
     int new_state = peek(&sra->stack).state;
