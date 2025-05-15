@@ -195,7 +195,7 @@ Production_rule* getProductionRules(FILE* file) {
     }
 
     #if (DEBUG_RF == ON)
-        printf("Printing rules: \n");
+        printf("Reading from the file: PROD_RULES:\n");
         for (int i = 0; i < num_rules; i++){
             printProductionRule(prod_list[i]);
         }
@@ -203,35 +203,6 @@ Production_rule* getProductionRules(FILE* file) {
 
     return prod_list;
 
-    /*
-    // Initialize a temporal variable with the saw info  
-    static const char* raw_prod_rules[NUM_RULES][3][MAX_RHSS][2] = PROD_RULES;
-    // Allocate all memory for the production rules
-    Production_rule* prod_list = malloc(NUM_RULES * sizeof(Production_rule));
-    if (!prod_list) {
-        printf("Memory allocation failed in production rules");
-        exit(EXIT_FAILURE);
-    }
-
-    for (int i = 0; i < NUM_RULES; i++) {
-        // Fill the Left hand side with its token
-        prod_list[i].lhs = createToken(getTokenCategory(raw_prod_rules[i][0][0][0]), raw_prod_rules[i][0][0][1]);
-        
-        prod_list[i].rhs_size = atoi(raw_prod_rules[i][2][0][0]);  
-        // Allocate memory for the Right Hand Side
-        prod_list[i].rhs = malloc(prod_list[i].rhs_size * sizeof(Token));
-        if (!prod_list[i].rhs) {
-            fprintf(stderr, "Memory allocation failed for RHS of rule %d\n", i);
-            exit(EXIT_FAILURE);
-        }
-        // Fill the information of the Right Hand Side
-        for (int j = 0; j < prod_list[i].rhs_size; j++) { 
-            prod_list[i].rhs[j] = createToken(getTokenCategory(raw_prod_rules[i][1][j][0]), raw_prod_rules[i][1][j][1]);
-        }
-    }
-
-    return prod_list;
-    */
 }
 
 int *getIntList(FILE *file, const char* title, int num_items){
@@ -362,26 +333,10 @@ void initCFG(CFG *grammar, FILE* file) {
     // Initialize terminals
     grammar->num_terminals = getNum(file, "NUM_TERMINALS");
     grammar->terminals = getCharList(file, "TERMINALS", grammar->num_terminals);
-
-    /* 
-    char *terminals[] = TERMINALS;
-    grammar->terminals = (char**)malloc(grammar->num_terminals * sizeof(char*));
-    for (int i = 0; i < grammar->num_terminals; ++i) {
-        grammar->terminals[i] = strdup(terminals[i]);  
-    }
-    */
     
     // Initialize non-terminals
     grammar->num_non_terminals = getNum(file, "NUM_NON_TERMINALS");
     grammar->non_terminals = getCharList(file, "NON_TERMINALS", grammar->num_non_terminals);
-
-    /*
-    char *non_terminals[] = NON_TERMINALS;
-    grammar->non_terminals = (char**)malloc(grammar->num_non_terminals * sizeof(char*));
-    for (int i = 0; i < grammar->num_non_terminals; ++i) {
-        grammar->non_terminals[i] = strdup(non_terminals[i]);
-    }
-    */
 
     //Initialize the rules
     Production_rule* rules = getProductionRules(file);
@@ -429,17 +384,6 @@ void initAutomata(const CFG *grammar, Automata* automata, FILE* file) {
     Action** actionTable = getTransitions(file, automata->num_states, automata->num_symbols);
     automata->transition_table = actionTable;
 
-    /*
-    static Action transition_data[NUM_STATES][NUM_TERMINALS + NUM_NON_TERMINALS] = TRANSITIONS;
-    automata->transition_table = malloc(NUM_STATES * sizeof(Action*));
- 
-    for (int i = 0; i < NUM_STATES; i++) {
-        automata->transition_table[i] = malloc(automata->num_symbols * sizeof(Action));
-        for (int j = 0; j < automata->num_symbols; j++) {
-            automata->transition_table[i][j] = transition_data[i][j];
-        }
-    }
-    */
 }
 
 // Shift-Reduce Automata initialization
@@ -600,6 +544,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
             return shift(sra, action, input_token);
 
         case REDUCE: 
+            // When using lookahead make sure the reduce is necessary
             return reduce(sra, action, stackNode);
         
         case ACCEPT:

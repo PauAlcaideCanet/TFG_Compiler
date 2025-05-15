@@ -61,6 +61,7 @@
     "stdio.h": "c",
     "cstdlib": "c",
     "automata.h": "c",
-    "definition.h": "c"
+    "definition.h": "c",
+    "token.h": "c"
   }
 }
