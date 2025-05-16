@@ -24,18 +24,19 @@ Made by Pau Alcaide Canet
 #include "node.h"
 
 /*========================================================================================*/
-/*------------- When enabled (ON) it shows information caught when reading from the input file -------------*/
-#define DEBUG_RF ON
+/*------------- When enabled (1) it shows information caught when reading from the input file -------------*/
+#define DEBUG_RF 0
 /*========================================================================================*/
 
 
 /*========================================================================================*/
-/*------------- When enabled (ON) it shows the operations done by the parser -------------*/
-#define DEBUGTOKEN ON
+/*------------- When enabled (1) it shows the operations done by the parser -------------*/
+#define DEBUGTOKEN 1
 /*========================================================================================*/
 
 #define MAX_RHSS 10
 #define MAX_LINE_LENGHT 256
+
 // Production rule definition
 typedef struct {
     Token lhs;      // Left hand side
@@ -75,7 +76,8 @@ typedef struct {
     Alphabet_symbol *alphabet;
     int num_symbols;                  
     int num_states;        
-    int start_state;     
+    int start_state;  
+    int num_accept_states;   
     int *accepting_states;     
     Action** transition_table;                
 } Automata;
@@ -87,13 +89,16 @@ typedef struct {
 } SR_Automata;
 
 //Printers
-void printProductionRule(Production_rule rule);
-void printAction(Action action);
+void printProductionRule(const Production_rule* rule);
+void printCFG(const CFG* cfg);
+void printSymbol(const Alphabet_symbol* symbol);
+void printAction(const Action* action);
+void printAutomata(const Automata* automata);
 
 //Getters
 int getNum(FILE* file, const char* title);
 char** getCharList(FILE* file, const char* title, int num_items);
-Production_rule* getProductionRules(FILE* file);
+Production_rule* getProductionRules(FILE* file, int num_rules);
 int* getIntList(FILE* file, const char* title, int num_items);
 Action** getTransitions(FILE* file, int num_states, int num_terms);
 

@@ -48,3 +48,9 @@ StackItem peek(Stack* stack) {
     StackItem error_item = { -1, { -1, "ERROR" } };
     return error_item;
 }
+
+void printStackItem(const StackItem *item){
+    printf("{ Token: ");
+    printToken(item->token);
+    printf("; State: %d} ", item->state);
+}

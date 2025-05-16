@@ -31,7 +31,7 @@ struct Node {
 Node* createTreeNode(Token token, int rule);
 void addChild(Node *parent, Node *child);
 void freeTree(Node *root);
-void printTree(Node *root, int indent);
+void printTree(Node *node, const char *prefix, int isLast);
 
 
 #endif // NODE_H

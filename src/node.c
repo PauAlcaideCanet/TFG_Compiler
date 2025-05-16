@@ -39,7 +39,7 @@ void freeTree(Node *root) {
     free(root);                     
 }
 
-void printTree(Node *root, int white) {
+/*void printTree(Node *root, int white) {
     if (root == NULL) return;
 
     // Print whitespace
@@ -62,5 +62,29 @@ void printTree(Node *root, int white) {
         printTree(current->child, white + 1);
         current = current->next;
     }
-}
+} */
 
+void printTree(Node *node, const char *prefix, int isLast) {
+    if (!node) return;
+
+    // ASCII-friendly tree symbols
+    printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, isLast ? "+-- " : "|-- ",node->id, node->token.lexeme, node->rule_num);
+
+    char newPrefix[256];
+    snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix, isLast ? "    " : "|   ");
+
+    int count = 0;
+    Node_children *temp = node->children;
+    while (temp) {
+        count++;
+        temp = temp->next;
+    }
+
+    int i = 0;
+    Node_children *child = node->children;
+    while (child) {
+        printTree(child->child, newPrefix, i == count - 1);
+        i++;
+        child = child->next;
+    }
+}

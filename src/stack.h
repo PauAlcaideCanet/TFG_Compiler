@@ -30,5 +30,6 @@ void init_stack(Stack* stack);
 void push(Stack* stack, int state, Token token);
 StackItem pop(Stack* stack);
 StackItem peek(Stack* stack);
+void printStackItem(const StackItem* item);
 
 #endif 

@@ -1,5 +1,9 @@
 #lexer
 
+
+#tokens
+
+
 #parser
 
 NUM_TERMINALS 7

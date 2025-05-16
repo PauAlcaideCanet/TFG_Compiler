@@ -19,9 +19,9 @@ void printToken(Token token) {
     printf("<%s, %s>", tokenNames[token.category], token.lexeme);
 }
 
-Token createToken(TokenType type, const char *lexeme) {
+Token createToken(TokenCat cat, const char *lexeme) {
     Token token;
-    token.category = type;
+    token.category = cat;
     token.lexeme = malloc(strlen(lexeme) + 1);
 
     if (!token.lexeme) {
@@ -40,17 +40,17 @@ void freeToken(Token *token) {
     }
 }
 
-TokenType getTokenCategory(const char* type_str) {
-    if (strcmp(type_str, "T_INT") == 0) return T_INT;
-    if (strcmp(type_str, "T_FLOAT") == 0) return T_FLOAT;
-    if (strcmp(type_str, "T_OPEN_PAR") == 0) return T_OPEN_PAR;
-    if (strcmp(type_str, "T_CLOSE_PAR") == 0) return T_CLOSE_PAR;
-    if (strcmp(type_str, "T_SUM") == 0) return T_SUM;
-    if (strcmp(type_str, "T_MULT") == 0) return T_MULT;
-    if (strcmp(type_str, "T_EOF") == 0) return T_EOF;
-    if (strcmp(type_str, "T_NON_TERMINAL") == 0) return T_NON_TERMINAL;
+TokenCat getTokenCategory(const char* cat_str) {
+    if (strcmp(cat_str, "T_INT") == 0) return T_INT;
+    if (strcmp(cat_str, "T_FLOAT") == 0) return T_FLOAT;
+    if (strcmp(cat_str, "T_OPEN_PAR") == 0) return T_OPEN_PAR;
+    if (strcmp(cat_str, "T_CLOSE_PAR") == 0) return T_CLOSE_PAR;
+    if (strcmp(cat_str, "T_SUM") == 0) return T_SUM;
+    if (strcmp(cat_str, "T_MULT") == 0) return T_MULT;
+    if (strcmp(cat_str, "T_EOF") == 0) return T_EOF;
+    if (strcmp(cat_str, "T_NON_TERMINAL") == 0) return T_NON_TERMINAL;
     
-    printf("Unknown token type: %s\n", type_str);
+    printf("Unknown token type: %s\n", cat_str);
     exit(EXIT_FAILURE);
 }
 

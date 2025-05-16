@@ -15,24 +15,90 @@ Made by Pau Alcaide Canet
 /*============== PRINTERS SECTION ======================*/
 // In this section, utility functions to print some structs are implemented.
 
-void printProductionRule(Production_rule rule) {
-    printToken(rule.lhs);
+void printProductionRule(const Production_rule* rule) {
+    printToken(rule->lhs);
     printf(" ->");
-    for (int i = 0; i < rule.rhs_size; i++) {
+    for (int i = 0; i < rule->rhs_size; i++) {
         printf(" ");
-        printToken(rule.rhs[i]);
+        printToken(rule->rhs[i]);
     }
     printf("\n");
 }
 
-void printAction(Action action){
+void printCFG(const CFG* cfg) {
+    printf("-- CFG Details --\n");
+
+    printf("Terminals:\n");
+    for (int i = 0; i < cfg->num_terminals; ++i) {
+        printf("%s, ", cfg->terminals[i]);
+    }
+    printf("\n");
+
+    printf("Non-terminals:\n");
+    for (int i = 0; i < cfg->num_non_terminals; ++i) {
+        printf("%s, ", cfg->non_terminals[i]);
+    }
+    printf("\n");
+
+    printf("Production Rules:\n");
+    for (int i = 0; i < cfg->num_rules; ++i) {
+        printProductionRule(&cfg->rules[i]); 
+    }
+}
+
+void printSymbol(const Alphabet_symbol* symbol){
+    if (symbol == NULL) {
+        printf("NULL symbol pointer\n");
+        return;
+    }
+
+    printf("( Symbol: %s,\t", symbol->symbol);
+    printf("Column: %d,\t", symbol->column);
+    if (symbol->is_terminal == 1){
+        printf("Type: Terminal)\n");
+    }else{
+        printf("Type: Non-Terminal)\n");
+    }
+}
+
+void printAction(const Action* action){
     char* type;
-    if (action.type == 0) type = "SHIFT";
-    else if (action.type == 1) type = "REDUCE";
-    else if (action.type == 2) type = "ACCEPT";
+    if (action->type == 0) type = "SHIFT";
+    else if (action->type == 1) type = "REDUCE";
+    else if (action->type == 2) type = "ACCEPT";
     else type = "ERROR";
 
-    printf("<%s, %d>",type, action.state);
+    printf("<%s, %d>",type, action->state);
+}
+
+void printAutomata(const Automata* automata){
+    if (automata == NULL) {
+        printf("NULL Automata pointer.\n");
+        return;
+    }
+
+    printf("-- Automaton Details --\n");
+    printf("Number of States: %d\n", automata->num_states);
+    printf("Starting State: %d\n", automata->start_state);
+
+    printf("Accepting States:");
+    for (int i = 0; i < automata->num_accept_states; ++i) {
+        printf("%d, ", automata->accepting_states[i]);
+    }
+    printf("\n");
+
+    printf("Alphabet Symbols:\n");
+    for (int i = 0; i < automata->num_symbols; ++i) {
+        printSymbol(&automata->alphabet[i]);
+    }
+
+    printf("\nTransition Table:\n");
+    for (int i = 0; i < automata->num_states; i++) {
+        for (int j = 0; j < automata->num_symbols; j++) {
+            printAction(&automata->transition_table[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 /*============== GETTERS SECTION ======================*/
@@ -49,7 +115,7 @@ int getNum(FILE *file, const char* title){
         if (strncmp(line, title, lenght) == 0) {
             int num;
             if (sscanf(line + lenght, " %d", &num) == 1) {
-                #if (DEBUG_RF == ON)
+                #if (DEBUG_RF == 1)
                     printf("Reading from the file: %s = %d\n", title, num);
                 #endif
                 
@@ -104,7 +170,7 @@ char **getCharList(FILE* file, const char* title, int num_items){
         }
     }
 
-    #if (DEBUG_RF == ON)
+    #if (DEBUG_RF == 1)
         printf("Reading from the file: %s:", title);
         for (int i = 0; i < num_items; i++){
             printf(" %s,", items[i]);
@@ -116,10 +182,7 @@ char **getCharList(FILE* file, const char* title, int num_items){
 }
 
 // Get the Rules from the input file
-Production_rule* getProductionRules(FILE* file) {  
-    
-    // Get the number of rules
-    int num_rules = getNum(file, "NUM_RULES");
+Production_rule* getProductionRules(FILE* file, int num_rules) {  
 
     // Allocate all memory for the production rules
     Production_rule* prod_list = malloc(num_rules * sizeof(Production_rule));
@@ -194,7 +257,7 @@ Production_rule* getProductionRules(FILE* file) {
         rule_index++;
     }
 
-    #if (DEBUG_RF == ON)
+    #if (DEBUG_RF == 1)
         printf("Reading from the file: PROD_RULES:\n");
         for (int i = 0; i < num_rules; i++){
             printProductionRule(prod_list[i]);
@@ -245,7 +308,7 @@ int *getIntList(FILE *file, const char* title, int num_items){
         }
     }
 
-    #if (DEBUG_RF == ON)
+    #if (DEBUG_RF == 1)
         printf("Reading from the file: %s:", title);
         for (int i = 0; i < num_items; i++){
             printf(" %d,", int_list[i]);
@@ -314,7 +377,7 @@ Action **getTransitions(FILE *file, int num_states, int num_terms){
         state_index++;
     }
 
-    #if (DEBUG_RF == ON)
+    #if (DEBUG_RF == 1)
         printf("Reading from the file: TRANSITIONS:\n");
         for (int i = 0; i < num_states; i++){
             for(int j = 0; j< num_terms; j++){
@@ -339,8 +402,16 @@ void initCFG(CFG *grammar, FILE* file) {
     grammar->non_terminals = getCharList(file, "NON_TERMINALS", grammar->num_non_terminals);
 
     //Initialize the rules
-    Production_rule* rules = getProductionRules(file);
+    int num_rules = getNum(file, "NUM_RULES");
+    grammar->num_rules = num_rules;
+
+    Production_rule* rules = getProductionRules(file, grammar->num_rules);
     grammar->rules = rules;   
+
+    #if (DEBUGTOKEN == 1)
+        printCFG(grammar);
+    #endif
+    
 }
 
 
@@ -364,8 +435,6 @@ void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) {
     }
 }
 
-
-
 // Automata initialization
 void initAutomata(const CFG *grammar, Automata* automata, FILE* file) {     
     //Init the Alphabet
@@ -377,12 +446,17 @@ void initAutomata(const CFG *grammar, Automata* automata, FILE* file) {
     automata->num_states = getNum(file, "NUM_STATES");
 
     //Init the accepting states
-    int num_accept_states = getNum(file, "NUM_ACCEPT_STATES");
-    automata->accepting_states = getIntList(file, "ACCEPT_STATES" ,num_accept_states);  
+    automata->num_accept_states = getNum(file, "NUM_ACCEPT_STATES");
+    automata->accepting_states = getIntList(file, "ACCEPT_STATES" ,automata->num_accept_states);  
 
     //Init the Transitions and put them into the automata struct
     Action** actionTable = getTransitions(file, automata->num_states, automata->num_symbols);
     automata->transition_table = actionTable;
+
+    #if (DEBUGTOKEN == 1)
+        printAutomata(automata);
+        printf("\n");
+    #endif
 
 }
 
@@ -462,7 +536,7 @@ int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
 int shift(SR_Automata *sra, Action action, Token input_token){
     push(&sra->stack, action.state, input_token);
 
-    #if (DEBUGTOKEN == ON)
+    #if (DEBUGTOKEN == 1)
         printf("The state %d and token <%s, %s> have been shifted\n", action.state, getCategoryFromToken(input_token), input_token.lexeme);
     #endif
 
@@ -509,12 +583,18 @@ int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     // Push the new state after reduction
     push(&sra->stack, goto_action.state, rule.lhs);
 
-    #if (DEBUGTOKEN == ON)
+    #if (DEBUGTOKEN == 1)
         printf("The reduce of the rule %s -> ", rule.lhs.lexeme);
         for (int i = 0; i < rule.rhs_size; i++){
             printf("%s ", rule.rhs[i].lexeme);
         }
         printf("has been aplied\n");
+
+        printf("The items poped out of the stack are: ");
+        for (int i = 0; i< rule.rhs_size; i++){
+            printStackItem(&items[i]);
+        }
+        printf("\n");
     #endif
 
     return REDUCE;

@@ -16,7 +16,7 @@ Made by Pau Alcaide Canet
 #include <string.h>
 
 
-// Define the enum for Token types
+// Define the enum for Token category
 typedef enum {
     //NUMS
     T_INT,
@@ -34,20 +34,20 @@ typedef enum {
     // If we wanted to have more than one we would need something to separate them (New-line or semicolon)
     T_EOF,
 
-    //This is temporary
+    //For non-terminal symbols
     T_NON_TERMINAL
 
-} TokenType;
+} TokenCat;
 
 // Define the Token struct
 typedef struct {
-    TokenType category;
+    TokenCat category;
     char *lexeme;
 } Token;
 
 void printToken(Token token);
-Token createToken(TokenType type, const char *lexeme);
-TokenType getTokenCategory(const char* type_str);
+Token createToken(TokenCat cat, const char *lexeme);
+TokenCat getTokenCategory(const char* cat_str);
 char* getCategoryFromToken(Token token);
 void freeToken(Token *token);
 

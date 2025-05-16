@@ -56,7 +56,8 @@ int main() {
         printf("\nThe tree is:\n");
 
         Node* root = peek_node(&AST);
-        printTree(root, 0);
+        //printTree(root, 0);
+        printTree(root, "", 1);
     #endif
     
     //Free the memory
