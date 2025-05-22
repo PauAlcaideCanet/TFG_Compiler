@@ -10,6 +10,7 @@ Node* createTreeNode(Token token, int rule) {
         node->rule_num = rule;     
         node->token = token;
         node->children = NULL;
+        node->type = NULL_OP;
     }
     return node;
 }
@@ -24,6 +25,7 @@ void addChild(Node *parent, Node *child) {
     }
 }
 
+// Free the tree structure
 void freeTree(Node *root) {
     if (root == NULL) return;
 
@@ -38,6 +40,62 @@ void freeTree(Node *root) {
     freeToken(&root->token);         
     free(root);                     
 }
+
+// Marks the parents in function of what does its children have
+void markParents(Node *node) {
+    if (!node) {
+        printf("You have tried to mark the parents in an empty tree!");
+        exit(1);
+    }
+
+    Node_children *child = node->children;
+    while (child != NULL) {
+        // Recursive call first to mark children
+        markParents(child->child);
+
+        // Check child's token category to decide parent's type
+        switch (child->child->token.category) {
+            case T_SUM:
+            case T_MULT:
+                node->type = BINARY_OP;
+                break;
+
+            case T_INT:
+                node->type = INT_OP;
+                break;
+
+            case T_OPEN_PAR:
+                node->type = PARENTHESIS_OP;
+                break;
+
+            /* Use it if needed in a future
+            case T_IF:
+                node->type = IF;
+                found = 1;
+                break;
+
+            case T_VAR_DECL:
+                node->type = VARIABLE_DECL;
+                found = 1;
+                break;
+
+            case T_FUNC_DECL:
+                node->type = FUNCTION_DECL;
+                found = 1;
+                break;
+
+            // Add other token categories here...
+            */
+
+            default:
+                // Do nothing if no match
+                break;
+        }
+            
+        child = child->next;
+    }
+}
+
 
 /*void printTree(Node *root, int white) {
     if (root == NULL) return;
@@ -67,9 +125,10 @@ void freeTree(Node *root) {
 void printTree(Node *node, const char *prefix, int isLast) {
     if (!node) return;
 
-    // ASCII-friendly tree symbols
+    // Line of node printing
     printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, isLast ? "+-- " : "|-- ",node->id, node->token.lexeme, node->rule_num);
 
+    // Compute if it is the last child and assign different chars whether is it or not
     char newPrefix[256];
     snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix, isLast ? "    " : "|   ");
 

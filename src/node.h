@@ -11,6 +11,17 @@
 #include "token.h"
 
 
+// Define the enum for the type of expression
+typedef enum {
+    NULL_OP,
+    INT_OP,
+    BINARY_OP,
+    PARENTHESIS_OP,
+    IF_OP,
+    VARIABLE_DECL_OP,
+    FUNCTION_DECL_OP
+} ExprType;
+
 typedef struct Node Node;
 
 // Children of the node
@@ -25,6 +36,7 @@ struct Node {
     int rule_num;
     Token token;
     Node_children *children;
+    ExprType type; //This sets the type of node
 };
 
 
