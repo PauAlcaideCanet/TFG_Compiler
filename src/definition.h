@@ -5,7 +5,7 @@ Shift-Reduce Automaton.
 
 Made by Pau Alcaide Canet
 ====================================================================================================*/
-
+#define MAX_LINE_LENGHT 256
 #define NUM_GRAMMAR 1
 
 #if (NUM_GRAMMAR == 1)

@@ -22,6 +22,7 @@ Made by Pau Alcaide Canet
 #include "definition.h"
 #include "node_stack.h"
 #include "node.h"
+#include "util.h"
 
 /*========================================================================================*/
 /*------------- When enabled (1) it shows information caught when reading from the input file -------------*/
@@ -35,7 +36,6 @@ Made by Pau Alcaide Canet
 /*========================================================================================*/
 
 #define MAX_RHSS 10
-#define MAX_LINE_LENGHT 256
 
 // Production rule definition
 typedef struct {

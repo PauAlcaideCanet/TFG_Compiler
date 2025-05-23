@@ -25,6 +25,88 @@ void addChild(Node *parent, Node *child) {
     }
 }
 
+void serializeTree(Node *node, FILE *out, int white) {
+    if (!node) return;
+
+    fprintf(out, "#tree\n\n");
+
+    printf("Serializing node: %d\n", node->id);
+    for(int i = 0; i< white; i++){
+        fprintf(out, "\t");
+    }
+
+    fprintf(out, "(ID: %d; RULE: %d; CATEGORY: %s; LEXEME: \"%s\" [\n", 
+        node->id, 
+        node->rule_num, 
+        getCategoryFromToken(node->token), 
+        node->token.lexeme);
+
+    Node_children *child = node->children;
+    while (child) {
+        serializeTree(child->child, out, (white + 1));
+        child = child->next;
+    }
+
+    for(int i = 0; i< white; i++){
+        fprintf(out, "\t");
+    }
+
+    fprintf(out, "])\n");
+}
+
+Node* deserializeTree(FILE* in){
+
+    char line[MAX_LINE_LENGHT];
+
+    // Look for the #tree section
+    while (fgets(line, sizeof(line), in)) {
+        if (strncmp(line, "#tree", 5) == 0) {
+            break;
+        }
+    }
+
+    int c;
+
+    // Skip whitespace
+    while ((c = fgetc(in)) != EOF && is_whitespace(c));
+
+    // This means that the tree in the file is not started by a parenthesis, which is the indication for a node start
+    if (c != '(') return NULL; 
+    
+    int id, rule;
+    char cat_buf[64], lex_buf[256];
+
+    // Parse ID
+    fscanf(in, "ID: %d; RULE: %d; CATEGORY: %[^;]; LEXEME \"%[^\"]\" [", &id, &rule, cat_buf, lex_buf);
+
+    // Convert category string to enum
+    TokenCat cat = getTokenCategory(cat_buf);
+    Token token = createToken(cat, lex_buf);
+
+    Node *node = createTreeNode(token, rule);
+    // Rectify the id assigned by createTreeNode
+    node->id = id;
+
+    // Read children
+    while (1) {
+        // Skip whitespace
+        while ((c = fgetc(in)) != EOF && is_whitespace(c));
+        if (c == ']') break;  // End of children
+
+        if (c == '(') {
+            ungetc(c, in);  // Put back the '(' to be able to call the function recursively
+            Node *child = deserializeTree(in);
+            if (child) addChild(node, child);
+        }
+    }
+
+    // Consume the closing ')'
+    while ((c = fgetc(in)) != EOF && c != ')');
+
+    return node;
+}
+
+
 // Free the tree structure
 void freeTree(Node *root) {
     if (root == NULL) return;

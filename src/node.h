@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "token.h"
+#include "util.h"
 
 
 // Define the enum for the type of expression
@@ -42,6 +43,10 @@ struct Node {
 
 Node* createTreeNode(Token token, int rule);
 void addChild(Node *parent, Node *child);
+
+void serializeTree(Node *node, FILE *out, int white);
+Node* deserializeTree(FILE* in);
+
 void freeTree(Node *root);
 void printTree(Node *node, const char *prefix, int isLast);
 

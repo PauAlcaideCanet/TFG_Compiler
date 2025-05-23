@@ -12,14 +12,14 @@
 int main() {
     
     //Open input file
-    FILE *file = fopen("input.txt", "r");  // Replace with your actual file path
-    if (!file) {
+    FILE *input = fopen("input.txt", "r");  
+    if (!input) {
         printf("Failed to open file\n");
     }
 
     // Create the automata and initializate it
     SR_Automata sra;
-    initSRAutomata(&sra, file);
+    initSRAutomata(&sra, input);
 
     //Create stack for the creation of the AST
     NodeStack AST;
@@ -51,18 +51,31 @@ int main() {
         }
     }
 
+    Node* root = peek_node(&AST);
+
     #if (GEN_TREE == ON)
         //Print the Abstract Syntax Tree
         printf("\nThe tree is:\n");
-
-        Node* root = peek_node(&AST);
         //printTree(root, 0);
         printTree(root, "", 1);
     #endif
+
+    //Open output file
+    FILE *out = fopen("out.txt", "w");  
+    if (!out) {
+        printf("Failed to open file\n");
+    }
+
+    serializeTree(root, out, 0);
+    fclose(out);
     
     //Free the memory
     freeSR_Automata(&sra);
     freeTree(root);
     
+    //Close files
+    fclose(input);
+    
+
     return 0; 
 }
