@@ -1,11 +1,12 @@
 /*====================================================================================================
 
-This file contains the implementation of the functions to initialize the structures of Production rules, 
-Context-free Grammar, Alphabet symbol, Action, Automata and Shift-Reduce Automata and to free
-their memory.
+This file is separed into 5 sections: PRINTERS, GETTERS, INITIALIZATION, RUN, FREE.
+In the printers section, utility functions to print some structs are implemented. 
+In the getters section, the functions that extract the information from the input file are found.
+In the initialization section, the functions that initialize the structs of CFG, Alphabet, Automata, and SRAutomata are found.
+In the run section, the functions needed to run the parser and generate the AST are found.
+In the free section, the functions that free the structs are found.
 
-Finally the implementation of the function to perform a step of a Shift-Reduce Automaton as well as 
-the shift and the reduce functions.
 
 Made by Pau Alcaide Canet
 ====================================================================================================*/
@@ -15,16 +16,18 @@ Made by Pau Alcaide Canet
 /*============== PRINTERS SECTION ======================*/
 // In this section, utility functions to print some structs are implemented.
 
-void printProductionRule(const Production_rule* rule) {
-    printToken(rule->lhs);
+// Prints the production rules
+void printProductionRule(Production_rule rule) {
+    printToken(rule.lhs);
     printf(" ->");
-    for (int i = 0; i < rule->rhs_size; i++) {
+    for (int i = 0; i < rule.rhs_size; i++) {
         printf(" ");
-        printToken(rule->rhs[i]);
+        printToken(rule.rhs[i]);
     }
     printf("\n");
 }
 
+// Prints de Context-Free Grammar struct
 void printCFG(const CFG* cfg) {
     printf("-- CFG Details --\n");
 
@@ -42,10 +45,11 @@ void printCFG(const CFG* cfg) {
 
     printf("Production Rules:\n");
     for (int i = 0; i < cfg->num_rules; ++i) {
-        printProductionRule(&cfg->rules[i]); 
+        printProductionRule(cfg->rules[i]); 
     }
 }
 
+// Prints a Symbol of the Alphabet
 void printSymbol(const Alphabet_symbol* symbol){
     if (symbol == NULL) {
         printf("NULL symbol pointer\n");
@@ -61,6 +65,7 @@ void printSymbol(const Alphabet_symbol* symbol){
     }
 }
 
+// Prints an action
 void printAction(const Action* action){
     char* type;
     if (action->type == 0) type = "SHIFT";
@@ -71,6 +76,7 @@ void printAction(const Action* action){
     printf("<%s, %d>",type, action->state);
 }
 
+// Prints a DFA
 void printAutomata(const Automata* automata){
     if (automata == NULL) {
         printf("NULL Automata pointer.\n");
@@ -104,7 +110,7 @@ void printAutomata(const Automata* automata){
 /*============== GETTERS SECTION ======================*/
 // In this section the functions that extract the information from the input file are found.
 
-//Get the number of terminal symbols from the input file
+//Get the title number from the input file      EX. title = NUM_TERMINALS
 int getNum(FILE *file, const char* title){
     char line[MAX_LINE_LENGHT];
     int lenght = strlen(title);
@@ -126,6 +132,7 @@ int getNum(FILE *file, const char* title){
     return -1;
 }
 
+// Gets a list of strings from the input file   EX. title = TERMINALS
 char **getCharList(FILE* file, const char* title, int num_items){
     // I have considered the line as a maximum of 256 characters
     char line[MAX_LINE_LENGHT];
@@ -268,6 +275,7 @@ Production_rule* getProductionRules(FILE* file, int num_rules) {
 
 }
 
+// Gets a list of integers from the input file with the title   EX. ACCEPT_STATES
 int *getIntList(FILE *file, const char* title, int num_items){
     char line[MAX_LINE_LENGHT];
     int length = strlen(title);
@@ -319,7 +327,7 @@ int *getIntList(FILE *file, const char* title, int num_items){
     return int_list;
 }
 
-
+// Gets the action for the transition table of the DFA
 Action **getTransitions(FILE *file, int num_states, int num_terms){
     char line[MAX_LINE_LENGHT];
     rewind(file);
@@ -381,7 +389,7 @@ Action **getTransitions(FILE *file, int num_states, int num_terms){
         printf("Reading from the file: TRANSITIONS:\n");
         for (int i = 0; i < num_states; i++){
             for(int j = 0; j< num_terms; j++){
-                printAction(table[i][j]);
+                printAction(&table[i][j]);
                 printf(", ");
             }
             printf("\n");
@@ -390,6 +398,9 @@ Action **getTransitions(FILE *file, int num_states, int num_terms){
 
     return table;
 }
+
+/*============== INITIALIZATION SECTION ======================*/
+// In this section the functions that initialize the structs of CFG, Alphabet, Automata, and SRAutomata are found.
 
 // Initialization of the Context-Free Grammar
 void initCFG(CFG *grammar, FILE* file) {         
@@ -413,8 +424,6 @@ void initCFG(CFG *grammar, FILE* file) {
     #endif
     
 }
-
-
 
 // Alphabet initialization
 void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { 
@@ -479,6 +488,9 @@ void initSRAutomata(SR_Automata* sra, FILE* file) {
     push(&sra->stack, sra->automata.start_state, empty_token); 
 }
 
+/*============== RUN SECTION ======================*/
+// In this section the functions needed to run the parser and generate the AST are found.
+
 // When there is a Reduce step, build the AST 
 void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num){
     // Create the supernode for the LHS token
@@ -511,7 +523,6 @@ void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rh
 
 }
 
-
 // Returns the associated column for the introduced token 
 int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
     for (int i = 0; i < num_symbols; i++) {
@@ -530,8 +541,6 @@ int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
     return -1; // Error case
 }
 
-
-
 // Implementation of the shift action
 int shift(SR_Automata *sra, Action action, Token input_token){
     push(&sra->stack, action.state, input_token);
@@ -543,8 +552,7 @@ int shift(SR_Automata *sra, Action action, Token input_token){
     return SHIFT;
 }
 
-
-
+// Implementation of the reduce action
 int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     // Fetch the rule to reduce 
     Production_rule rule = sra->grammar.rules[action.state];
@@ -600,8 +608,6 @@ int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     return REDUCE;
 }
 
-
-
 // Executes a step of the Shift-Reduce Automata
 int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
     if (!sra) {
@@ -648,7 +654,8 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
     return ERROR;
 }
 
-
+/*============== FREE SECTION ======================*/
+// In this section the functions that free the structs are found. 
 
 // Free the memory of the CFG 
 void freeCFG(CFG *grammar) {
@@ -680,8 +687,6 @@ void freeCFG(CFG *grammar) {
     free(grammar->rules); // Free rules array
 }
 
-
-
 // Free the memory of the Automata   
 void freeAutomata(Automata *automata) {
     if (!automata) return;
@@ -709,8 +714,6 @@ void freeAutomata(Automata *automata) {
         automata->transition_table = NULL;
     }
 }
-
-
 
 // Free the memory of the Shift-Reduce Automata 
 void freeSR_Automata(SR_Automata *sra) {

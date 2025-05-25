@@ -9,7 +9,9 @@
 // Putting GEN_TREE to ON makes the program print the tree
 #define GEN_TREE ON
 
-int main() {
+#define MAX_NUM_TOKENS 128
+
+int main(int argc, char *argv[]) {
     
     //Open input file
     FILE *input = fopen("input.txt", "r");  
@@ -26,22 +28,13 @@ int main() {
     initNodeStack(&AST);
 
 
-    // List of tokens to parse
-    Token tokens[] = {
-        createToken(T_INT, "5"),
-        createToken(T_SUM, "+"),
-        createToken(T_OPEN_PAR, "("),
-        createToken(T_INT, "3"),
-        createToken(T_CLOSE_PAR, ")"),
-        createToken(T_EOF, "")
-    };
-
-    int num_tokens = sizeof(tokens) / sizeof(tokens[0]);
+    // Get the list of tokens to parser from the input file
+    Token* tokens = deserializeTokens(input);
 
     // Process each token using the Shift-Reduce Automaton
     int step = 0;
     int i = 0;
-    while (i < num_tokens && step != ERROR && step != ACCEPT) {
+    while (i < MAX_NUM_TOKENS && step != ERROR && step != ACCEPT) {
 
         step = SRAutomata_step(&sra, tokens[i], &AST);
 
@@ -66,6 +59,8 @@ int main() {
         printf("Failed to open file\n");
     }
 
+    // Put the AST into a file
+    fprintf(out, "#tree\n\n");
     serializeTree(root, out, 0);
     fclose(out);
     

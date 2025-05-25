@@ -17,6 +17,7 @@ Node* createTreeNode(Token token, int rule) {
 
 // Add a child to a node
 void addChild(Node *parent, Node *child) {
+    // Allocate memory for the child
     Node_children *newChild = (Node_children*) malloc(sizeof(Node_children));
     if (newChild != NULL) {
         newChild->child = child;
@@ -25,35 +26,39 @@ void addChild(Node *parent, Node *child) {
     }
 }
 
+// Function to print the tree into a file
 void serializeTree(Node *node, FILE *out, int white) {
     if (!node) return;
 
-    fprintf(out, "#tree\n\n");
-
     printf("Serializing node: %d\n", node->id);
+
+    // Print the tabulations before the node
     for(int i = 0; i< white; i++){
         fprintf(out, "\t");
     }
 
+    // Print the node
     fprintf(out, "(ID: %d; RULE: %d; CATEGORY: %s; LEXEME: \"%s\" [\n", 
         node->id, 
         node->rule_num, 
         getCategoryFromToken(node->token), 
         node->token.lexeme);
 
+    // Print the children recursively
     Node_children *child = node->children;
     while (child) {
         serializeTree(child->child, out, (white + 1));
         child = child->next;
     }
 
+    // Print the closing brackets for the node
     for(int i = 0; i< white; i++){
         fprintf(out, "\t");
     }
-
     fprintf(out, "])\n");
 }
 
+// Function to gather the information of the tree from the input file and initialize the tree structure
 Node* deserializeTree(FILE* in){
 
     char line[MAX_LINE_LENGHT];
@@ -66,13 +71,14 @@ Node* deserializeTree(FILE* in){
     }
 
     int c;
-
     // Skip whitespace
     while ((c = fgetc(in)) != EOF && is_whitespace(c));
 
     // This means that the tree in the file is not started by a parenthesis, which is the indication for a node start
-    if (c != '(') return NULL; 
-    
+    if (c != '(') {
+        printf("There has been an error reading from the input file in the \"#tree\" section\n");
+        return NULL; 
+    }
     int id, rule;
     char cat_buf[64], lex_buf[256];
 
@@ -106,11 +112,11 @@ Node* deserializeTree(FILE* in){
     return node;
 }
 
-
 // Free the tree structure
 void freeTree(Node *root) {
     if (root == NULL) return;
 
+    // Free recursiverly all nodes
     Node_children *current = root->children;
     while (current != NULL) {
         Node_children *next = current->next;
@@ -150,25 +156,6 @@ void markParents(Node *node) {
                 node->type = PARENTHESIS_OP;
                 break;
 
-            /* Use it if needed in a future
-            case T_IF:
-                node->type = IF;
-                found = 1;
-                break;
-
-            case T_VAR_DECL:
-                node->type = VARIABLE_DECL;
-                found = 1;
-                break;
-
-            case T_FUNC_DECL:
-                node->type = FUNCTION_DECL;
-                found = 1;
-                break;
-
-            // Add other token categories here...
-            */
-
             default:
                 // Do nothing if no match
                 break;
@@ -178,42 +165,26 @@ void markParents(Node *node) {
     }
 }
 
-
-/*void printTree(Node *root, int white) {
-    if (root == NULL) return;
-
-    // Print whitespace
-    for (int i = 0; i < white; ++i) {
-        printf("  ");
-    }
-
-    printf("%d: ", root->id);
-
-    // Print token info
-    if (root->token.lexeme != NULL) {
-        printf("%s\n", root->token.lexeme);
-    } else {
-        printf("[category: %d]\n", root->token.category);  
-    }
-
-    // Recurse into children
-    Node_children *current = root->children;
-    while (current != NULL) {
-        printTree(current->child, white + 1);
-        current = current->next;
-    }
-} */
-
+// Function to print the Abstract Syntax tree 
 void printTree(Node *node, const char *prefix, int isLast) {
+    // prefix takes care of the indentation and the starting string to print in each line
+    // isLast is a boolean that is true (1) when the node is the last child of its parent
+
     if (!node) return;
 
-    // Line of node printing
-    printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, isLast ? "+-- " : "|-- ",node->id, node->token.lexeme, node->rule_num);
-
-    // Compute if it is the last child and assign different chars whether is it or not
+    // newPrefix used to descrive if the next node printing will have "    " or "|   " depending on if it is the last child
     char newPrefix[256];
-    snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix, isLast ? "    " : "|   ");
 
+    // Line of node printing
+    if (isLast){
+        printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, "+-- ", node->id, node->token.lexeme, node->rule_num);
+        snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix,"    ");
+    }else{
+        printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, "|-- ", node->id, node->token.lexeme, node->rule_num);
+        snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix, "|   ");
+    }
+
+    // Count the number of children
     int count = 0;
     Node_children *temp = node->children;
     while (temp) {
@@ -221,6 +192,7 @@ void printTree(Node *node, const char *prefix, int isLast) {
         temp = temp->next;
     }
 
+    // Call recursively the function to print all nodes
     int i = 0;
     Node_children *child = node->children;
     while (child) {

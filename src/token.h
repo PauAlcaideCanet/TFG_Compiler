@@ -49,6 +49,8 @@ void printToken(Token token);
 Token createToken(TokenCat cat, const char *lexeme);
 TokenCat getTokenCategory(const char* cat_str);
 char* getCategoryFromToken(Token token);
+
+Token* deserializeTokens(FILE* file);
 void freeToken(Token *token);
 
 #endif

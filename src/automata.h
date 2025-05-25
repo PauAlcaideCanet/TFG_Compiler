@@ -24,17 +24,6 @@ Made by Pau Alcaide Canet
 #include "node.h"
 #include "util.h"
 
-/*========================================================================================*/
-/*------------- When enabled (1) it shows information caught when reading from the input file -------------*/
-#define DEBUG_RF 0
-/*========================================================================================*/
-
-
-/*========================================================================================*/
-/*------------- When enabled (1) it shows the operations done by the parser -------------*/
-#define DEBUGTOKEN 1
-/*========================================================================================*/
-
 #define MAX_RHSS 10
 
 // Production rule definition
@@ -70,7 +59,6 @@ typedef struct {
     int state;  // Transition state for Shift or production rule for Reduce
 } Action;
 
-
 //Automata definition
 typedef struct {
     Alphabet_symbol *alphabet;
@@ -82,6 +70,7 @@ typedef struct {
     Action** transition_table;                
 } Automata;
 
+// Shift-reduce Automata definition
 typedef struct {
     Automata automata;
     Stack stack;    
@@ -89,7 +78,7 @@ typedef struct {
 } SR_Automata;
 
 //Printers
-void printProductionRule(const Production_rule* rule);
+void printProductionRule(Production_rule rule);
 void printCFG(const CFG* cfg);
 void printSymbol(const Alphabet_symbol* symbol);
 void printAction(const Action* action);
