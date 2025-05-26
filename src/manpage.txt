@@ -1,0 +1,10 @@
+To execute:
+
+main <input_file_path> <flag>
+
+The flags are optional
+FLAGS:
+
+-help   Show the manpage
+-t      Serialize the tree to an output file
+-rt     Read directly from the tree in the input file

@@ -8,50 +8,48 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "token.h"
+#include "util.h"
 
-// Enumeration of the Type of nodes in the Abstract syntax tree
+
+// Define the enum for the type of expression
 typedef enum {
-    NODE_INTEGER,
-    NODE_BINARY_OPERATION,
-    NODE_GROUPING
-} NodeType;
+    NULL_OP,
+    INT_OP,
+    BINARY_OP,
+    PARENTHESIS_OP,
+    IF_OP,
+    VARIABLE_DECL_OP,
+    FUNCTION_DECL_OP
+} ExprType;
 
-// Base expression structure
-typedef struct Expression {
-    NodeType type;
-} Expression;
+typedef struct Node Node;
 
-// Integer Node
-typedef struct {
-    Expression base;
-    int value;
-} IntNode;
+// Children of the node
+typedef struct Node_children {
+    Node *child;
+    struct Node_children *next;
+} Node_children;
 
-// Binary Operation Node (sum, mult, ...)
-typedef struct {
-    Expression base;
-    char operation;     // '+' or '*'
-    Expression *lhs;
-    Expression *rhs;
-} BinaryOperationNode;
-
-// Grouping Node (for parenthesis)
-typedef struct {
-    Expression base;
-    Expression *expression;
-} GroupingNode;
-
-// AST Root Structure
-typedef struct {
-    Expression *root;  // Root of the AST
-} AST;
+// Tree node
+struct Node {
+    int id;
+    int rule_num;
+    Token token;
+    Node_children *children;
+    ExprType type; //This sets the type of node
+};
 
 
-IntNode *createIntegerNode(char* value);
-BinaryOperationNode *createBinaryOperationNode(char operation, Expression *lhs, Expression *rhs);
-GroupingNode *createGroupingNode(Expression *expression);
-void initAST(AST *ast);
-void printAST(Expression *node);
-void freeAST(Expression *node);
+Node* createTreeNode(Token token, int rule);
+void addChild(Node *parent, Node *child);
+
+void serializeTree(Node *node, FILE *out, int white);
+Node* deserializeTree(FILE* in, int recursion);
+
+void freeTree(Node *root);
+void markParents(Node *node);
+void printTree(Node *node, const char *prefix, int isLast);
+
 
 #endif // NODE_H

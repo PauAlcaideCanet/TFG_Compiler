@@ -16,16 +16,16 @@ Made by Pau Alcaide Canet
 #ifndef AUTOMATA_H
 #define AUTOMATA_H
 
+#include <stdio.h>
 #include "token.h"
 #include "stack.h"
 #include "definition.h"
-
-/*========================================================================================*/
-/*------------- When enabled (ON) it shows the operations done by the parser -------------*/
-#define DEBUGTOKEN ON
-/*========================================================================================*/
+#include "node_stack.h"
+#include "node.h"
+#include "util.h"
 
 #define MAX_RHSS 10
+
 // Production rule definition
 typedef struct {
     Token lhs;      // Left hand side
@@ -59,42 +59,56 @@ typedef struct {
     int state;  // Transition state for Shift or production rule for Reduce
 } Action;
 
-
 //Automata definition
 typedef struct {
     Alphabet_symbol *alphabet;
     int num_symbols;                  
     int num_states;        
-    int start_state;     
+    int start_state;  
+    int num_accept_states;   
     int *accepting_states;     
     Action** transition_table;                
 } Automata;
 
+// Shift-reduce Automata definition
 typedef struct {
     Automata automata;
     Stack stack;    
     CFG grammar;              
 } SR_Automata;
 
+//Printers
+void printProductionRule(Production_rule rule);
+void printCFG(const CFG* cfg);
+void printSymbol(const Alphabet_symbol* symbol);
+void printAction(const Action* action);
+void printAutomata(const Automata* automata);
 
+//Getters
+int getNum(FILE* file, const char* title);
+char** getCharList(FILE* file, const char* title, int num_items);
+Production_rule* getProductionRules(FILE* file, int num_rules);
+int* getIntList(FILE* file, const char* title, int num_items);
+Action** getTransitions(FILE* file, int num_states, int num_terms);
 
 // Initialization functions
-void initCFG(CFG *grammar);
+void initCFG(CFG *grammar, FILE* file);
 void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet);
-void initAutomata(const CFG *grammar, Automata* automata);
-void initSRAutomata(SR_Automata* automata);
+void initAutomata(const CFG *grammar, Automata* automata, FILE* file);
+void initSRAutomata(SR_Automata* automata, FILE* file);
+
+//AST Node creator
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num);
 
 // Execution
-int SRAutomata_step(SR_Automata *SRAutomata, Token input_token);
+int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);
 int shift(SR_Automata *sra, Action action, Token input_token);
-int reduce(SR_Automata *sra, Action action);
+int reduce(SR_Automata *sra, Action action, NodeStack* stackNode);
+int SRAutomata_step(SR_Automata *SRAutomata, Token input_token, NodeStack* stackNode);
 
 // Free memory functions
 void freeCFG(CFG *grammar);
 void freeAutomata(Automata *automata);
 void freeSR_Automata(SR_Automata *SRAutomata);
 
-//Getters
-int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);
-Production_rule* getProductionRules();
 #endif

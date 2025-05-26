@@ -1,83 +1,432 @@
 /*====================================================================================================
 
-This file contains the implementation of the functions to initialize the structures of Production rules, 
-Context-free Grammar, Alphabet symbol, Action, Automata and Shift-Reduce Automata and to free
-their memory.
+This file is separed into 5 sections: PRINTERS, GETTERS, INITIALIZATION, RUN, FREE.
+In the printers section, utility functions to print some structs are implemented. 
+In the getters section, the functions that extract the information from the input file are found.
+In the initialization section, the functions that initialize the structs of CFG, Alphabet, Automata, and SRAutomata are found.
+In the run section, the functions needed to run the parser and generate the AST are found.
+In the free section, the functions that free the structs are found.
 
-Finally the implementation of the function to perform a step of a Shift-Reduce Automaton as well as 
-the shift and the reduce functions.
 
 Made by Pau Alcaide Canet
 ====================================================================================================*/
 
-#include <stdio.h>
-#include "token.h"
-#include "stack.h"
 #include "automata.h"
 
-// Get the Rules from its definition
-Production_rule* getProductionRules() {   
-    // Initialize a temporal variable with the saw info  
-    static const char* raw_prod_rules[NUM_RULES][3][MAX_RHSS][2] = PROD_RULES;
+/*============== PRINTERS SECTION ======================*/
+// In this section, utility functions to print some structs are implemented.
+
+// Prints the production rules
+void printProductionRule(Production_rule rule) {
+    printToken(rule.lhs);
+    printf(" ->");
+    for (int i = 0; i < rule.rhs_size; i++) {
+        printf(" ");
+        printToken(rule.rhs[i]);
+    }
+    printf("\n");
+}
+
+// Prints de Context-Free Grammar struct
+void printCFG(const CFG* cfg) {
+    printf("-- CFG Details --\n");
+
+    printf("Terminals:\n");
+    for (int i = 0; i < cfg->num_terminals; ++i) {
+        printf("%s, ", cfg->terminals[i]);
+    }
+    printf("\n");
+
+    printf("Non-terminals:\n");
+    for (int i = 0; i < cfg->num_non_terminals; ++i) {
+        printf("%s, ", cfg->non_terminals[i]);
+    }
+    printf("\n");
+
+    printf("Production Rules:\n");
+    for (int i = 0; i < cfg->num_rules; ++i) {
+        printProductionRule(cfg->rules[i]); 
+    }
+}
+
+// Prints a Symbol of the Alphabet
+void printSymbol(const Alphabet_symbol* symbol){
+    if (symbol == NULL) {
+        printf("NULL symbol pointer\n");
+        return;
+    }
+
+    printf("( Symbol: %s,\t", symbol->symbol);
+    printf("Column: %d,\t", symbol->column);
+    if (symbol->is_terminal == 1){
+        printf("Type: Terminal)\n");
+    }else{
+        printf("Type: Non-Terminal)\n");
+    }
+}
+
+// Prints an action
+void printAction(const Action* action){
+    char* type;
+    if (action->type == 0) type = "SHIFT";
+    else if (action->type == 1) type = "REDUCE";
+    else if (action->type == 2) type = "ACCEPT";
+    else type = "ERROR";
+
+    printf("<%s, %d>",type, action->state);
+}
+
+// Prints a DFA
+void printAutomata(const Automata* automata){
+    if (automata == NULL) {
+        printf("NULL Automata pointer.\n");
+        return;
+    }
+
+    printf("-- Automaton Details --\n");
+    printf("Number of States: %d\n", automata->num_states);
+    printf("Starting State: %d\n", automata->start_state);
+
+    printf("Accepting States:");
+    for (int i = 0; i < automata->num_accept_states; ++i) {
+        printf("%d, ", automata->accepting_states[i]);
+    }
+    printf("\n");
+
+    printf("Alphabet Symbols:\n");
+    for (int i = 0; i < automata->num_symbols; ++i) {
+        printSymbol(&automata->alphabet[i]);
+    }
+
+    printf("\nTransition Table:\n");
+    for (int i = 0; i < automata->num_states; i++) {
+        for (int j = 0; j < automata->num_symbols; j++) {
+            printAction(&automata->transition_table[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+/*============== GETTERS SECTION ======================*/
+// In this section the functions that extract the information from the input file are found.
+
+//Get the title number from the input file      EX. title = NUM_TERMINALS
+int getNum(FILE *file, const char* title){
+    char line[MAX_LINE_LENGHT];
+    int lenght = strlen(title);
+    rewind(file);  // Make sure we start reading from the beginning of the file
+
+    while (fgets(line, sizeof(line), file)) {
+        // Read the first (length of the string passed as parameter)
+        if (strncmp(line, title, lenght) == 0) {
+            int num;
+            if (sscanf(line + lenght, " %d", &num) == 1) {
+                #if (DEBUG_RF == 1)
+                    printf("Reading from the file: %s = %d\n", title, num);
+                #endif
+                
+                return num;
+            }
+        }
+    }
+    return -1;
+}
+
+// Gets a list of strings from the input file   EX. title = TERMINALS
+char **getCharList(FILE* file, const char* title, int num_items){
+    // I have considered the line as a maximum of 256 characters
+    char line[MAX_LINE_LENGHT];
+    char **items = malloc(num_items * sizeof(char*));
+    int length = strlen(title);
+    if (!items) {
+        printf("Memory allocation failed when reading %s\n", title);
+        return NULL;
+    }
+
+    int item_count = 0;
+    rewind(file);  // Make sure we start reading from the beginning of the file
+
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, title, length) == 0) {
+            // search for the {
+            char *start = strchr(line, '{');
+            // search for the }
+            char *end = strrchr(line, '}');
+            if (!start || !end) {
+                printf("No %s have been found\n", title);
+                return NULL;
+            }
+
+            *end = '\0';
+            start++;
+
+            char *item = strtok(start, ",");
+            while (item && item_count < num_items) {
+                // Eliminate whitespaces
+                while (*item == ' ') item++;
+
+                items[item_count] = strdup(item);
+                item_count++;
+
+                // Check for the next terminal
+                item = strtok(NULL, ",");
+            }
+
+
+            break;
+        }
+    }
+
+    #if (DEBUG_RF == 1)
+        printf("Reading from the file: %s:", title);
+        for (int i = 0; i < num_items; i++){
+            printf(" %s,", items[i]);
+        }
+        printf("\n");
+    #endif
+
+    return items;
+}
+
+// Get the Rules from the input file
+Production_rule* getProductionRules(FILE* file, int num_rules) {  
+
     // Allocate all memory for the production rules
-    Production_rule* prod_list = malloc(NUM_RULES * sizeof(Production_rule));
+    Production_rule* prod_list = malloc(num_rules * sizeof(Production_rule));
     if (!prod_list) {
         printf("Memory allocation failed in production rules");
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < NUM_RULES; i++) {
-        // Fill the Left hand side with its token
-        prod_list[i].lhs = createToken(getTokenCategory(raw_prod_rules[i][0][0][0]), raw_prod_rules[i][0][0][1]);
-        
-        prod_list[i].rhs_size = atoi(raw_prod_rules[i][2][0][0]);  
-        // Allocate memory for the Right Hand Side
-        prod_list[i].rhs = malloc(prod_list[i].rhs_size * sizeof(Token));
-        if (!prod_list[i].rhs) {
-            fprintf(stderr, "Memory allocation failed for RHS of rule %d\n", i);
-            exit(EXIT_FAILURE);
-        }
-        // Fill the information of the Right Hand Side
-        for (int j = 0; j < prod_list[i].rhs_size; j++) { 
-            prod_list[i].rhs[j] = createToken(getTokenCategory(raw_prod_rules[i][1][j][0]), raw_prod_rules[i][1][j][1]);
-        }
-    }
+    char line[MAX_LINE_LENGHT];
+    rewind(file);
 
-    return prod_list;
-}
-
-
-
-// Initialization of the Context-Free Grammar
-void initCFG(CFG *grammar) {         
-    // Initialize terminals
-    grammar->num_terminals = NUM_TERMINALS;
-
-    char *terminals[] = TERMINALS;
-    grammar->terminals = (char**)malloc(NUM_TERMINALS * sizeof(char*));
-    for (int i = 0; i < NUM_TERMINALS; ++i) {
-        grammar->terminals[i] = strdup(terminals[i]);  
+    
+    // Find the "PROD_RULES" block
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "PROD_RULES", 10) == 0) break;
     }
     
-    // Initialize non-terminals
-    grammar->num_non_terminals = NUM_NON_TERMINALS;
+    int rule_index = 0;
+    while (rule_index < num_rules && fgets(line, sizeof(line), file)) {
+        // The last line is a }, so if it is found get
+        if (line[0] == '}') break; // End of rules
+        
+        // Strip spaces and newlines
+        char *ptr = line;
+        while (*ptr == ' ' || *ptr == '\t') ptr++;
 
-    char *non_terminals[] = NON_TERMINALS;
-    grammar->non_terminals = (char**)malloc(NUM_NON_TERMINALS * sizeof(char*));
-    for (int i = 0; i < NUM_NON_TERMINALS; ++i) {
-        grammar->non_terminals[i] = strdup(non_terminals[i]);
+        char lhs_cat[32], lhs_lex[32];
+        int rhs_count;
+
+        // Parse LHS token
+        if (sscanf(ptr, "{{%[^,], %[^}]}", lhs_cat, lhs_lex) != 2) {
+            printf("Failed to parse LHS of rule %d\n", rule_index);
+            exit(EXIT_FAILURE);
+        }
+
+        prod_list[rule_index].lhs = createToken(getTokenCategory(lhs_cat), lhs_lex);
+        
+        // Find start of RHS tokens
+        char *rhs_start = strchr(ptr, '{');
+        rhs_start = strchr(rhs_start + 2, '{'); // Skip LHS { }
+        rhs_start++;
+
+        // Allocate memory for the right hand side tokens
+        Token *rhs = malloc(MAX_RHSS * sizeof(Token));  // temporary size
+        int rhs_index = 0;
+
+        // Put the information of the file inside the list of tokens
+        char rhs_cat[32], rhs_val[32];
+        while ((rhs_start = strchr(rhs_start, '{')) && rhs_index < MAX_RHSS) {
+            if (sscanf(rhs_start, "{%[^,], %[^}]}", rhs_cat, rhs_val) != 2) break;
+
+            rhs[rhs_index++] = createToken(getTokenCategory(rhs_cat), rhs_val);
+
+            // Move past the current '}' to search for the next '{'
+            
+            rhs_start = strchr(rhs_start, '}');
+            rhs_start++;  // move past the closing brace
+        }
+
+        prod_list[rule_index].rhs_size = rhs_index;
+        prod_list[rule_index].rhs = malloc(rhs_index * sizeof(Token));
+        if (!prod_list[rule_index].rhs) {
+            printf("Failed to allocate RHS for rule %d\n", rule_index);
+            exit(EXIT_FAILURE);
+        }
+
+        // Put the information of the rhs inside the production rule struct
+        memcpy(prod_list[rule_index].rhs, rhs, rhs_index * sizeof(Token));
+
+        free(rhs);
+
+        rule_index++;
     }
 
+    #if (DEBUG_RF == 1)
+        printf("Reading from the file: PROD_RULES:\n");
+        for (int i = 0; i < num_rules; i++){
+            printProductionRule(prod_list[i]);
+        }
+    #endif
 
-    //Initialize the rules
-    Production_rule* rules = getProductionRules();
-    grammar->rules = rules;   
+    return prod_list;
+
 }
 
+// Gets a list of integers from the input file with the title   EX. ACCEPT_STATES
+int *getIntList(FILE *file, const char* title, int num_items){
+    char line[MAX_LINE_LENGHT];
+    int length = strlen(title);
+    rewind(file);  // Start from the beginning
 
+    char* start;
+    int item_count = 0;
+    int* int_list = malloc (num_items * sizeof(int));
+
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, title, length) == 0) {
+            // search for the {
+            char *start = strchr(line, '{');
+            // search for the }
+            char *end = strrchr(line, '}');
+            if (!start || !end) {
+                printf("No %s have been found\n", title);
+                return NULL;
+            }
+
+            *end = '\0';
+            start++;
+
+            char *num = strtok(start, ",");
+            while (num && item_count < num_items) {
+                // Eliminate whitespaces
+                while (*num == ' ') num++;
+
+                int_list[item_count] = atoi(num);
+                item_count++;
+
+                // Check for the next number
+                num = strtok(NULL, ",");
+            }
+
+
+            break;
+        }
+    }
+
+    #if (DEBUG_RF == 1)
+        printf("Reading from the file: %s:", title);
+        for (int i = 0; i < num_items; i++){
+            printf(" %d,", int_list[i]);
+        }
+        printf("\n");
+    #endif
+
+    return int_list;
+}
+
+// Gets the action for the transition table of the DFA
+Action **getTransitions(FILE *file, int num_states, int num_terms){
+    char line[MAX_LINE_LENGHT];
+    rewind(file);
+
+    // Allocate memory for all the table
+    Action **table = malloc(num_states * sizeof(Action *));
+    if (!table) {
+        fprintf(stderr, "Memory allocation failed for transitions table\n");
+        return NULL;
+    }
+
+    for (int i = 0; i < num_states; i++) {
+        table[i] = malloc(num_terms * sizeof(Action));
+        if (!table[i]) {
+            fprintf(stderr, "Memory allocation failed for row %d\n", i);
+            return NULL;
+        }
+    }
+
+    // To remember in which state are we
+    int state_index = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "TRANSITIONS", 11) == 0) break; // Go to transitions
+    }
+
+    while (fgets(line, sizeof(line), file) && state_index < num_states) {
+        //Remove whitespaces and tabulations at the beginning
+        char *ptr = line;
+        while (*ptr && (*ptr == ' ' || *ptr == '\t')) ptr++;
+
+        char action_type[16];
+        int number;
+
+        for (int i = 0; i < num_terms; i++) {
+            // Put the info in the txt to the variables
+            if (sscanf(ptr, "{%[^,], %d}", action_type, &number) != 2) {
+                fprintf(stderr, "Error parsing action at state %d, terminal %d\n", state_index, i);
+                break;
+            }
+            
+            // Match the string with the ActionType and put it in the table
+            if (strcmp(action_type, "SHIFT") == 0) table[state_index][i].type = SHIFT;
+            else if (strcmp(action_type, "REDUCE") == 0) table[state_index][i].type = REDUCE;
+            else if (strcmp(action_type, "ACCEPT") == 0) table[state_index][i].type = ACCEPT;
+            else table[state_index][i].type = ERROR;
+
+            table[state_index][i].state = number;
+
+            // Move ptr past this action
+            ptr = strchr(ptr, '}');
+            if (ptr) ptr+=2; // skip to next
+        }
+
+        state_index++;
+    }
+
+    #if (DEBUG_RF == 1)
+        printf("Reading from the file: TRANSITIONS:\n");
+        for (int i = 0; i < num_states; i++){
+            for(int j = 0; j< num_terms; j++){
+                printAction(&table[i][j]);
+                printf(", ");
+            }
+            printf("\n");
+        }
+    #endif
+
+    return table;
+}
+
+/*============== INITIALIZATION SECTION ======================*/
+// In this section the functions that initialize the structs of CFG, Alphabet, Automata, and SRAutomata are found.
+
+// Initialization of the Context-Free Grammar
+void initCFG(CFG *grammar, FILE* file) {         
+    // Initialize terminals
+    grammar->num_terminals = getNum(file, "NUM_TERMINALS");
+    grammar->terminals = getCharList(file, "TERMINALS", grammar->num_terminals);
+    
+    // Initialize non-terminals
+    grammar->num_non_terminals = getNum(file, "NUM_NON_TERMINALS");
+    grammar->non_terminals = getCharList(file, "NON_TERMINALS", grammar->num_non_terminals);
+
+    //Initialize the rules
+    int num_rules = getNum(file, "NUM_RULES");
+    grammar->num_rules = num_rules;
+
+    Production_rule* rules = getProductionRules(file, grammar->num_rules);
+    grammar->rules = rules;   
+
+    #if (DEBUGTOKEN == 1)
+        printCFG(grammar);
+    #endif
+    
+}
 
 // Alphabet initialization
-void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { //Funciona
+void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { 
     int index = 0;
     // Fill the terminals into the alphabet
     for (int i = 0; i < grammar->num_terminals; i++) {
@@ -95,56 +444,84 @@ void initAlphabet(const CFG *grammar, Alphabet_symbol* alphabet) { //Funciona
     }
 }
 
-
-
 // Automata initialization
-void initAutomata(const CFG *grammar, Automata* automata) {     //Aixo està bé
+void initAutomata(const CFG *grammar, Automata* automata, FILE* file) {     
     //Init the Alphabet
     automata->num_symbols = grammar->num_terminals + grammar->num_non_terminals;
     automata->alphabet = malloc(automata->num_symbols * sizeof(Alphabet_symbol));
     initAlphabet(grammar, automata->alphabet);
 
-    automata->num_states = NUM_STATES;
-    automata->start_state = START_STATE;
+    automata->start_state = getNum(file, "START_STATE");
+    automata->num_states = getNum(file, "NUM_STATES");
 
     //Init the accepting states
-    int accept_states[] = ACCEPT_STATES;  
-    int num_accept_states = sizeof(accept_states) / sizeof(accept_states[0]); //Divide by the first element (int) (it can be changed to sizeof(int))
-    automata->accepting_states = malloc(num_accept_states * sizeof(int));
-    memcpy(automata->accepting_states, accept_states, num_accept_states * sizeof(int));
+    automata->num_accept_states = getNum(file, "NUM_ACCEPT_STATES");
+    automata->accepting_states = getIntList(file, "ACCEPT_STATES" ,automata->num_accept_states);  
 
-    
-    //Init the Transitions
-    static Action transition_data[NUM_STATES][NUM_TERMINALS + NUM_NON_TERMINALS] = TRANSITIONS;
-    automata->transition_table = malloc(NUM_STATES * sizeof(Action*));
- 
-    for (int i = 0; i < NUM_STATES; i++) {
-        automata->transition_table[i] = malloc(automata->num_symbols * sizeof(Action));
-        for (int j = 0; j < automata->num_symbols; j++) {
-            automata->transition_table[i][j] = transition_data[i][j];
-        }
-    }
+    //Init the Transitions and put them into the automata struct
+    Action** actionTable = getTransitions(file, automata->num_states, automata->num_symbols);
+    automata->transition_table = actionTable;
+
+    #if (DEBUGTOKEN == 1)
+        printAutomata(automata);
+        printf("\n");
+    #endif
+
 }
 
-
-
 // Shift-Reduce Automata initialization
-void initSRAutomata(SR_Automata* sra) {
+void initSRAutomata(SR_Automata* sra, FILE* file) {
     if (sra == NULL) {
-        fprintf(stderr, "Error: SR_Automata pointer is NULL\n");
+        printf("Error: SR_Automata pointer is NULL\n");
         exit(EXIT_FAILURE);
     }
+
     // Initialize the context-free grammar (CFG)
-    initCFG(&sra->grammar);
+    initCFG(&sra->grammar, file);
+    
+    // Initialize the automaton using the grammar
+    initAutomata(&sra->grammar, &sra->automata, file);
+
     // Initialize the stack
     init_stack(&sra->stack);
     Token empty_token = (Token){-1, ""};
-    push(&sra->stack, START_STATE, empty_token); 
-    // Initialize the automaton using the grammar
-    initAutomata(&sra->grammar, &sra->automata);
+    push(&sra->stack, sra->automata.start_state, empty_token); 
 }
 
+/*============== RUN SECTION ======================*/
+// In this section the functions needed to run the parser and generate the AST are found.
 
+// When there is a Reduce step, build the AST 
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num){
+    // Create the supernode for the LHS token
+    Node *lhsNode = createTreeNode(rule.lhs, rule_num);
+
+    // Iterate over the RHS tokens
+    for (int i = 0; i < rule.rhs_size; ++i) {
+        Token token = rhsTokens[i].token;
+
+        //Create the child node
+        Node *child = NULL;
+
+        if (token.category == T_NON_TERMINAL) {
+            // Pop node from stack (previous subtree)
+            child = pop_node(nodeStack);
+            if (!child) {
+                printf("Error: Stack underflow when handling non-terminal.\n");
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            // Create a new node for the terminal token
+            child = createTreeNode(token, -1);
+        }
+
+        addChild(lhsNode, child);
+    }
+
+    // Push the newly built subtree (lhsNode) onto the stack
+    push_node(nodeStack, lhsNode);
+
+}
 
 // Returns the associated column for the introduced token 
 int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
@@ -164,22 +541,19 @@ int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols) {
     return -1; // Error case
 }
 
-
-
 // Implementation of the shift action
 int shift(SR_Automata *sra, Action action, Token input_token){
     push(&sra->stack, action.state, input_token);
 
-    #if (DEBUGTOKEN == ON)
+    #if (DEBUGTOKEN == 1)
         printf("The state %d and token <%s, %s> have been shifted\n", action.state, getCategoryFromToken(input_token), input_token.lexeme);
     #endif
 
     return SHIFT;
 }
 
-
-
-int reduce(SR_Automata *sra, Action action){
+// Implementation of the reduce action
+int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     // Fetch the rule to reduce 
     Production_rule rule = sra->grammar.rules[action.state];
 
@@ -194,9 +568,8 @@ int reduce(SR_Automata *sra, Action action){
         }
     }
 
-    /* ==========================
-    Aqui va la generació del AST
-    =============================*/
+    // Generation of the AST
+    buildNodeFromRule(rule, stackNode, items, action.state);
 
     // Get the current state after popping
     int new_state = peek(&sra->stack).state;
@@ -218,21 +591,25 @@ int reduce(SR_Automata *sra, Action action){
     // Push the new state after reduction
     push(&sra->stack, goto_action.state, rule.lhs);
 
-    #if (DEBUGTOKEN == ON)
+    #if (DEBUGTOKEN == 1)
         printf("The reduce of the rule %s -> ", rule.lhs.lexeme);
         for (int i = 0; i < rule.rhs_size; i++){
             printf("%s ", rule.rhs[i].lexeme);
         }
         printf("has been aplied\n");
+
+        printf("The items poped out of the stack are: ");
+        for (int i = 0; i< rule.rhs_size; i++){
+            printStackItem(&items[i]);
+        }
+        printf("\n");
     #endif
 
     return REDUCE;
 }
 
-
-
 // Executes a step of the Shift-Reduce Automata
-int SRAutomata_step(SR_Automata *sra, Token input_token) {
+int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
     if (!sra) {
         printf("Error: SR_Automata pointer is NULL\n");
         exit(EXIT_FAILURE);
@@ -253,7 +630,8 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
             return shift(sra, action, input_token);
 
         case REDUCE: 
-            return reduce(sra, action);
+            // When using lookahead make sure the reduce is necessary
+            return reduce(sra, action, stackNode);
         
         case ACCEPT:
             int num_accept =  sizeof(sra->automata.accepting_states)/sizeof(int);
@@ -276,7 +654,8 @@ int SRAutomata_step(SR_Automata *sra, Token input_token) {
     return ERROR;
 }
 
-
+/*============== FREE SECTION ======================*/
+// In this section the functions that free the structs are found. 
 
 // Free the memory of the CFG 
 void freeCFG(CFG *grammar) {
@@ -308,8 +687,6 @@ void freeCFG(CFG *grammar) {
     free(grammar->rules); // Free rules array
 }
 
-
-
 // Free the memory of the Automata   
 void freeAutomata(Automata *automata) {
     if (!automata) return;
@@ -338,8 +715,6 @@ void freeAutomata(Automata *automata) {
     }
 }
 
-
-
 // Free the memory of the Shift-Reduce Automata 
 void freeSR_Automata(SR_Automata *sra) {
     if (!sra) return;
@@ -347,4 +722,3 @@ void freeSR_Automata(SR_Automata *sra) {
     freeCFG(&sra->grammar);     // Free grammar rules & lexemes
     freeAutomata(&sra->automata); // Free automata structures
 }
-
