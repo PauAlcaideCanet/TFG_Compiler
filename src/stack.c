@@ -11,12 +11,12 @@ Made by Pau Alcaide Canet
 #include <stdlib.h>
 #include "stack.h"
 
-
+// Stack initializer function
 void init_stack(Stack* stack) {
     stack->top = -1;
 }
 
-
+// Function to push an item into the stack
 void push(Stack* stack, int state, Token token) {
     if (stack->top < MAX_STACK - 1) {
         stack->top++;
@@ -27,6 +27,7 @@ void push(Stack* stack, int state, Token token) {
     }
 }
 
+// Function to pop a stack item from the stack
 StackItem pop(Stack* stack) {
     StackItem top;
     if (stack->top >= 0) {
@@ -39,7 +40,7 @@ StackItem pop(Stack* stack) {
     return error_item;
 }
 
-// Peek function
+// Function to peek the first item in the stack
 StackItem peek(Stack* stack) {
     if (stack->top >= 0) {
         return stack->items[stack->top];
@@ -49,6 +50,7 @@ StackItem peek(Stack* stack) {
     return error_item;
 }
 
+// Function to print a stack item
 void printStackItem(const StackItem *item){
     printf("{ Token: ");
     printToken(item->token);

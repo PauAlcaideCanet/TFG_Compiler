@@ -45,9 +45,10 @@ Node* createTreeNode(Token token, int rule);
 void addChild(Node *parent, Node *child);
 
 void serializeTree(Node *node, FILE *out, int white);
-Node* deserializeTree(FILE* in);
+Node* deserializeTree(FILE* in, int recursion);
 
 void freeTree(Node *root);
+void markParents(Node *node);
 void printTree(Node *node, const char *prefix, int isLast);
 
 

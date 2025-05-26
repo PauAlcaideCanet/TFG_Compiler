@@ -30,17 +30,18 @@ void cgen(Node *node, FILE *out) {
 
 // This function generates code for an integer
 void genInt(Node *node, FILE *out){
+    Node* num = node->children->child;
     // Load the number into the accumulator
-    fprintf(out, "li $a0, %s\n", node->token.lexeme);
+    fprintf(out, "li $a0, %s\n", num->token.lexeme);
 }
 
 
 // This function generates the code for a binary operation -------[ Assuming only integers ]-----------
 void genBinaryOp(Node *node, FILE *out){
-
+        
         //Get the right and left opperand nodes
-        Node *right = node->children->child;
-        Node *left = node->children->next->child;
+        Node *left = node->children->child;
+        Node *right = node->children->next->next->child;
 
         // Get the code for the left side in the accumulator
         cgen(left, out);

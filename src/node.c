@@ -1,3 +1,10 @@
+/*====================================================================================================
+
+This file contains the functions to create and manipulate nodes of the AST.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
+
 #include "node.h"
 
 // Create a new TreeNode from a Token
@@ -59,15 +66,21 @@ void serializeTree(Node *node, FILE *out, int white) {
 }
 
 // Function to gather the information of the tree from the input file and initialize the tree structure
-Node* deserializeTree(FILE* in){
+Node* deserializeTree(FILE* in, int recursion){
 
     char line[MAX_LINE_LENGHT];
 
-    // Look for the #tree section
-    while (fgets(line, sizeof(line), in)) {
-        if (strncmp(line, "#tree", 5) == 0) {
-            break;
+    if(recursion == 0){
+        rewind(in);
+        // Look for the #tree section
+        while (fgets(line, sizeof(line), in)) {
+            if (strncmp(line, "#tree", 5) == 0) {
+                break;
+            }
         }
+        #if (DEBUG_RF == 1)
+            printf("\nReading the information of the tree from the file:\n");
+        #endif
     }
 
     int c;
@@ -83,8 +96,12 @@ Node* deserializeTree(FILE* in){
     char cat_buf[64], lex_buf[256];
 
     // Parse ID
-    fscanf(in, "ID: %d; RULE: %d; CATEGORY: %[^;]; LEXEME \"%[^\"]\" [", &id, &rule, cat_buf, lex_buf);
+    fscanf(in, "ID: %d; RULE: %d; CATEGORY: %[^;]; LEXEME: \"%[^\"]\" [", &id, &rule, cat_buf, lex_buf);
 
+    #if (DEBUG_RF == 1)
+        printf("ID: %d; RULE: %d; CATEGORY: %s; LEXEME %s\n",id, rule, cat_buf, lex_buf);
+    #endif
+    
     // Convert category string to enum
     TokenCat cat = getTokenCategory(cat_buf);
     Token token = createToken(cat, lex_buf);
@@ -98,10 +115,11 @@ Node* deserializeTree(FILE* in){
         // Skip whitespace
         while ((c = fgetc(in)) != EOF && is_whitespace(c));
         if (c == ']') break;  // End of children
+        if (c == ')') break;
 
         if (c == '(') {
             ungetc(c, in);  // Put back the '(' to be able to call the function recursively
-            Node *child = deserializeTree(in);
+            Node *child = deserializeTree(in, 1);
             if (child) addChild(node, child);
         }
     }
@@ -131,6 +149,13 @@ void freeTree(Node *root) {
 
 // Marks the parents in function of what does its children have
 void markParents(Node *node) {
+    /*  This function is used as an intermediate step between the tree creation and 
+        the translation into MIPS code. It adds a type to the node in order to know which 
+        translation does it have to do. 
+
+        EX. If it finds the token T_SUM, we know that the previous child is the left operand
+        and the next child is the right operand, so we mark the parent as a sum node.*/
+        
     if (!node) {
         printf("You have tried to mark the parents in an empty tree!");
         exit(1);
