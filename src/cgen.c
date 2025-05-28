@@ -41,6 +41,7 @@ void genBinaryOp(Node *node, FILE *out){
         
         //Get the right and left opperand nodes
         Node *left = node->children->child;
+        Node *op = node->children->next->child;
         Node *right = node->children->next->next->child;
 
         // Get the code for the left side in the accumulator
@@ -55,6 +56,13 @@ void genBinaryOp(Node *node, FILE *out){
         fprintf(out, "lw $t1, 4($sp)\n");         
         fprintf(out, "addiu $sp, $sp, 4\n");
 
-        fprintf(out, "add $a0, $t1, $a0\n");      // Perfom the addition
+        if(strcmp(op->token.lexeme, "+") == 0){
+            fprintf(out, "add $a0, $t1, $a0\n");      // Perfom the addition
+        }else if(strcmp(op->token.lexeme, "-") == 0){
+            fprintf(out, "sub $a0, $t1, $a0\n");      // Perfom the substraction
+        }else if(strcmp(op->token.lexeme, "*") == 0){
+            fprintf(out, "mul $a0, $t1, $a0\n");      // Perfom the multiplication
+        }// At the moment the division is not supported.
+
 }
 
