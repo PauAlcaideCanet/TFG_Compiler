@@ -722,3 +722,4 @@ void freeSR_Automata(SR_Automata *sra) {
     freeCFG(&sra->grammar);     // Free grammar rules & lexemes
     freeAutomata(&sra->automata); // Free automata structures
 }
+

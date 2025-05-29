@@ -7,9 +7,6 @@
 #include "node_stack.h"
 #include "cgen.h"
 
-// Putting GEN_TREE to ON makes the program print the tree
-#define GEN_TREE ON
-
 #define MAX_NUM_TOKENS 128
 
 int main(int argc, char *argv[]) {
@@ -23,7 +20,7 @@ int main(int argc, char *argv[]) {
             helpFlag = 1;
         }else if (strcmp(argv[i], "-rt") == 0){
             readTreeFlag = 1;
-        }else if (strcmp(argv[i], "-r") == 0){
+        }else if (strcmp(argv[i], "-t") == 0){
             serializeTreeFlag = 1;
         }
     }
@@ -102,7 +99,7 @@ int main(int argc, char *argv[]) {
         freeSR_Automata(&sra);
     }
     
-    #if (GEN_TREE == ON)
+    #if (GEN_TREE == 1)
         //Print the Abstract Syntax Tree
         printf("\nThe tree is:\n");
         //printTree(root, 0);

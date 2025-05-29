@@ -21,6 +21,10 @@ Made by Pau Alcaide Canet
 #define DEBUGTOKEN 0
 /*========================================================================================*/
 
+// Putting GEN_TREE to ON (1) makes the program print the tree
+#define GEN_TREE 1
+
+
 #define MAX_LINE_LENGHT 256
 
 int is_whitespace(char c);

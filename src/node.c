@@ -1,6 +1,10 @@
 /*====================================================================================================
 
-This file contains the functions to create and manipulate nodes of the AST.
+This file contains the implementation of the functions needed to create the Abstract Syntax Tree
+Also contains functions to serialize the information of the tree and deserialize it. 
+
+Finally  the functions to print and free the tree are provided with a method that visits the 
+tree recursively and marks the parents depending on the attributes of its children.
 
 Made by Pau Alcaide Canet
 ====================================================================================================*/
@@ -163,22 +167,29 @@ void markParents(Node *node) {
 
     Node_children *child = node->children;
     while (child != NULL) {
+        // ======= Pensar si puc sortir del bucle abans ========
+
         // Recursive call first to mark children
         markParents(child->child);
 
         // Check child's token category to decide parent's type
         switch (child->child->token.category) {
-            case T_SUM:
-            case T_MULT:
-                node->type = BINARY_OP;
-                break;
-
-            case T_INT:
+            case T_NUMBER:
                 node->type = INT_OP;
                 break;
 
-            case T_OPEN_PAR:
+            case T_OPERAND:
+                node->type = BINARY_OP;
+                break;
+
+            case T_SPECIALCHAR:
                 node->type = PARENTHESIS_OP;
+                break;
+            
+            case T_KEYWORD:
+                if(strcmp(child->child->token.lexeme, "if") == 0){
+                    node->type = IF_OP;
+                }
                 break;
 
             default:

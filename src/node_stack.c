@@ -1,3 +1,10 @@
+/*====================================================================================================
+
+This file contains the implementation of the functions manipulate the stack of nodes.
+
+Made by Pau Alcaide Canet
+====================================================================================================*/
+
 #include "node_stack.h"
 
 void initNodeStack(NodeStack* stack) {

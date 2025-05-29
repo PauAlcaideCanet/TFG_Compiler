@@ -19,7 +19,6 @@ Made by Pau Alcaide Canet
 #include <stdio.h>
 #include "token.h"
 #include "stack.h"
-#include "definition.h"
 #include "node_stack.h"
 #include "node.h"
 #include "util.h"

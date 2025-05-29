@@ -13,12 +13,13 @@ Made by Pau Alcaide Canet
 
 // From the category in string format, get the actual category
 TokenCat getTokenCategory(const char* cat_str) {
-    if (strcmp(cat_str, "T_INT") == 0) return T_INT;
-    if (strcmp(cat_str, "T_FLOAT") == 0) return T_FLOAT;
-    if (strcmp(cat_str, "T_OPEN_PAR") == 0) return T_OPEN_PAR;
-    if (strcmp(cat_str, "T_CLOSE_PAR") == 0) return T_CLOSE_PAR;
-    if (strcmp(cat_str, "T_SUM") == 0) return T_SUM;
-    if (strcmp(cat_str, "T_MULT") == 0) return T_MULT;
+    if (strcmp(cat_str, "T_NUMBER") == 0) return T_NUMBER;
+    if (strcmp(cat_str, "T_IDENTIFIER") == 0) return T_IDENTIFIER;
+    if (strcmp(cat_str, "T_KEYWORD") == 0) return T_KEYWORD;
+    if (strcmp(cat_str, "T_LITERAL") == 0) return T_LITERAL;
+    if (strcmp(cat_str, "T_OPERAND") == 0) return T_OPERAND;
+    if (strcmp(cat_str, "T_SPECIALCHAR") == 0) return T_SPECIALCHAR;
+    if (strcmp(cat_str, "T_NONRECOGNIZED") == 0) return T_NONRECOGNIZED;
     if (strcmp(cat_str, "T_EOF") == 0) return T_EOF;
     if (strcmp(cat_str, "T_NON_TERMINAL") == 0) return T_NON_TERMINAL;
     
@@ -28,14 +29,15 @@ TokenCat getTokenCategory(const char* cat_str) {
 
 // Get the category of the token in a string format
 char* getCategoryFromToken(Token token){
-    if (token.category == 0) return "T_INT";
-    if (token.category == 1) return "T_FLOAT";
-    if (token.category == 2) return "T_OPEN_PAR";
-    if (token.category == 3) return "T_CLOSE_PAR";
-    if (token.category == 4) return "T_SUM";
-    if (token.category == 5) return "T_MULT";
-    if (token.category == 6) return "T_EOF";
-    if (token.category == 7) return "T_NON_TERMINAL";
+    if (token.category == T_NUMBER) return "T_NUMBER";
+    if (token.category == T_IDENTIFIER) return "T_IDENTIFIER";
+    if (token.category == T_KEYWORD) return "T_KEYWORD";
+    if (token.category == T_LITERAL) return "T_LITERAL";
+    if (token.category == T_OPERAND) return "T_OPERAND";
+    if (token.category == T_SPECIALCHAR) return "T_SPECIALCHAR";
+    if (token.category == T_NONRECOGNIZED) return "T_NONRECOGNIZED";
+    if (token.category == T_EOF) return "T_EOF";
+    if (token.category == T_NON_TERMINAL) return "T_NON_TERMINAL";
 
     printf("Unknown token type %d\n", token.category);
     exit(EXIT_FAILURE);
