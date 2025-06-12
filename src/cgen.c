@@ -48,17 +48,17 @@ void genInt(Node *node, FILE *out){
 
 // Function to perform the sum
 void genSum(FILE* out){
-     fprintf(out, "add $a0, $t1, $a0\n");      // Perfom the addition
+    fprintf(out, "add $a0, $t1, $a0\n");      // Perfom the addition
 }
 
 // Function to perform the substraction
 void genSub(FILE* out){
-     fprintf(out, "sub $a0, $t1, $a0\n");       // Perfom the substraction
+    fprintf(out, "sub $a0, $t1, $a0\n");       // Perfom the substraction
 }
 
 // Function to perform the multiplication
 void genMul(FILE* out){
-     fprintf(out, "mul $a0, $t1, $a0\n");       // Perfom the multiplication
+    fprintf(out, "mul $a0, $t1, $a0\n");       // Perfom the multiplication
 }
 
 // Function to handle the equal comparison
@@ -143,8 +143,6 @@ void genBinaryOp(Node *node, FILE *out){
             fprintf(stderr, "Unknown binary operator: %s\n", op_lex);
         }
 }
-
-
 
 // This function generates code for a ternary operations
 void genTernaryOp(Node* node, FILE* out) {
