@@ -510,6 +510,7 @@ void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rh
                 printf("Error: Stack underflow when handling non-terminal.\n");
                 exit(EXIT_FAILURE);
             }
+
         } else {
             // Create a new node for the terminal token
             child = createTreeNode(token, -1);
@@ -518,6 +519,13 @@ void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rh
         addChild(lhsNode, child);
     }
 
+    if (lhsNode->children->next != NULL){
+        printf("\n");
+        printf("Test: %s\n", lhsNode->children->next->child->token.lexeme);
+        printf("Test: %d", lhsNode->children->next->child->id);
+        printf("\n");
+    }
+    
     // Push the newly built subtree (lhsNode) onto the stack
     push_node(nodeStack, lhsNode);
 
@@ -584,12 +592,13 @@ int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     // Get the transition state for the LHS
     Action goto_action = sra->automata.transition_table[new_state][lhs_column];
     if (goto_action.type == ERROR) {
-        printf("ERROR: No transition found for LHS '%s' in state %d!\n", rule.lhs.lexeme, new_state);
+        printf("ERROR: No transition found for '%s' in state %d!\n", rule.lhs.lexeme, new_state);
         exit(EXIT_FAILURE);
     }
 
     // Push the new state after reduction
     push(&sra->stack, goto_action.state, rule.lhs);
+  
 
     #if (DEBUGTOKEN == 1)
         printf("The reduce of the rule %s -> ", rule.lhs.lexeme);
@@ -633,8 +642,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
             return reduce(sra, action, stackNode);
         
         case ACCEPT:
-            int num_accept =  sizeof(sra->automata.accepting_states)/sizeof(int);
-            for (int i = 0; i < num_accept; i++){
+            for (int i = 0; i < sra->automata.num_accept_states; i++){
                 if (sra->automata.accepting_states[i] == state){
                     printf("Input accepted!\n");
                     return ACCEPT;
@@ -645,7 +653,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
             return ERROR;
         
         case ERROR:
-            printf("There has been an error in the parsing process a token '%s'!\n", input_token.lexeme);
+            printf("There has been an error in the parsing process at token '%s'!\n", input_token.lexeme);
             return ERROR;
         default:
             printf("Syntax error at token '%s'.\n", input_token.lexeme);

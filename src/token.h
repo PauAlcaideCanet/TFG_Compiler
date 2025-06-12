@@ -31,8 +31,9 @@ typedef enum {
     T_LITERAL,
         
     //Operations like +, *, ==, <=, ...
-    T_SUM,
     T_MULT,
+    T_SUM,
+    
     T_SUB,
     T_EQUAL,
     T_NOT_EQUAL,
