@@ -8,4 +8,3 @@ token_stream = CommonTokenStream(lexer)
 parser = testParser(token_stream)
 tree = parser.root()
 print(tree.toStringTree(recog=parser))
-

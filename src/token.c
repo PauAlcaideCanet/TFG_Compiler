@@ -17,8 +17,22 @@ TokenCat getTokenCategory(const char* cat_str) {
     if (strcmp(cat_str, "T_IDENTIFIER") == 0) return T_IDENTIFIER;
     if (strcmp(cat_str, "T_KEYWORD") == 0) return T_KEYWORD;
     if (strcmp(cat_str, "T_LITERAL") == 0) return T_LITERAL;
-    if (strcmp(cat_str, "T_OPERAND") == 0) return T_OPERAND;
-    if (strcmp(cat_str, "T_SPECIALCHAR") == 0) return T_SPECIALCHAR;
+    
+    // Operands
+    if (strcmp(cat_str, "T_SUM") == 0) return T_SUM;
+    if (strcmp(cat_str, "T_MULT") == 0) return T_MULT;
+    if (strcmp(cat_str, "T_SUB") == 0) return T_SUB;
+    if (strcmp(cat_str, "T_EQUAL") == 0) return T_EQUAL;
+    if (strcmp(cat_str, "T_NOT_EQUAL") == 0) return T_NOT_EQUAL;
+    if (strcmp(cat_str, "T_LESS_THAN") == 0) return T_LESS_THAN;
+    if (strcmp(cat_str, "T_MORE_THAN") == 0) return T_MORE_THAN;
+    if (strcmp(cat_str, "T_LESS_EQUAL") == 0) return T_LESS_EQUAL;
+    if (strcmp(cat_str, "T_MORE_EQUAL") == 0) return T_MORE_EQUAL;
+
+    // Special characters 
+    if (strcmp(cat_str, "T_OPEN_PAR") == 0) return T_OPEN_PAR;
+    if (strcmp(cat_str, "T_CLOSE_PAR") == 0) return T_CLOSE_PAR;
+
     if (strcmp(cat_str, "T_NONRECOGNIZED") == 0) return T_NONRECOGNIZED;
     if (strcmp(cat_str, "T_EOF") == 0) return T_EOF;
     if (strcmp(cat_str, "T_NON_TERMINAL") == 0) return T_NON_TERMINAL;
@@ -32,9 +46,23 @@ char* getCategoryFromToken(Token token){
     if (token.category == T_NUMBER) return "T_NUMBER";
     if (token.category == T_IDENTIFIER) return "T_IDENTIFIER";
     if (token.category == T_KEYWORD) return "T_KEYWORD";
-    if (token.category == T_LITERAL) return "T_LITERAL";
-    if (token.category == T_OPERAND) return "T_OPERAND";
-    if (token.category == T_SPECIALCHAR) return "T_SPECIALCHAR";
+    if (token.category == T_LITERAL) return "T_LITERAL";  
+    
+    // Operands
+    if (token.category == T_SUM) return "T_SUM";    
+    if (token.category == T_MULT) return "T_MULT";
+    if (token.category == T_SUB) return "T_SUB";
+    if (token.category == T_EQUAL) return "T_EQUAL";
+    if (token.category == T_NOT_EQUAL) return "T_NOT_EQUAL";
+    if (token.category == T_LESS_THAN) return "T_LESS_THAN";
+    if (token.category == T_MORE_THAN) return "T_MORE_THAN";
+    if (token.category == T_LESS_EQUAL) return "T_LESS_EQUAL";
+    if (token.category == T_MORE_EQUAL) return "T_MORE_EQUAL";
+    
+    // Special characters
+    if (token.category == T_OPEN_PAR) return "T_OPEN_PAR";
+    if (token.category == T_CLOSE_PAR) return "T_CLOSE_PAR";
+    
     if (token.category == T_NONRECOGNIZED) return "T_NONRECOGNIZED";
     if (token.category == T_EOF) return "T_EOF";
     if (token.category == T_NON_TERMINAL) return "T_NON_TERMINAL";

@@ -18,8 +18,9 @@
 %left PLUS
 
 %%
-expr: expr PLUS term     { printf("A sum!"); }
-    | term              {}
+expr: //Left-hand side
+        expr PLUS term     { printf("A sum!"); } // Right-hand side
+    |   term               {}
     ;
 
 term: NUMBER            { printf("A number!"); }

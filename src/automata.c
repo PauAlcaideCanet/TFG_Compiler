@@ -630,7 +630,6 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
             return shift(sra, action, input_token);
 
         case REDUCE: 
-            // When using lookahead make sure the reduce is necessary
             return reduce(sra, action, stackNode);
         
         case ACCEPT:

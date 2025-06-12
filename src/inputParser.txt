@@ -1,0 +1,34 @@
+#parser
+
+NUM_TERMINALS 6
+TERMINALS {T_NUMBER, T_OPEN_PAR, T_CLOSE_PAR, T_SUM, T_MULT, T_EOF}
+NUM_NON_TERMINALS 4
+NON_TERMINALS {S, E, T, F} 
+NUM_RULES 7
+PROD_RULES {    
+    {{T_NON_TERMINAL, S}, {{T_NON_TERMINAL, E}, {T_EOF, _}}, 2}                                                
+    {{T_NON_TERMINAL, E}, {{T_NON_TERMINAL, E}, {T_SUM, +}, {T_NON_TERMINAL, T}}, 3}     
+    {{T_NON_TERMINAL, E}, {{T_NON_TERMINAL, T}}, 1}                                              
+    {{T_NON_TERMINAL, T}, {{T_NON_TERMINAL, T}, {T_MULT, *}, {T_NON_TERMINAL, F}}, 3}    
+    {{T_NON_TERMINAL, T}, {{T_NON_TERMINAL, F}}, 1}                                              
+    {{T_NON_TERMINAL, F}, {{T_OPEN_PAR, (}, {T_NON_TERMINAL, E}, {T_CLOSE_PAR, )}}, 3}   
+    {{T_NON_TERMINAL, F}, {{T_NUMBER, NUM}}, 1}                                                    
+}
+START_STATE 0
+NUM_STATES 12
+NUM_ACCEPT_STATES 1
+ACCEPT_STATES {1}  
+TRANSITIONS {   
+    {SHIFT, 5},{SHIFT, 4},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 1},{SHIFT, 2},{SHIFT, 3}
+    {ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 6},{ERROR, -1},{ACCEPT, 0},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1}
+    {REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{SHIFT, 7},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2},{REDUCE, 2}
+    {REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4},{REDUCE, 4}
+    {SHIFT, 5},{SHIFT, 4},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 8},{SHIFT, 2},{SHIFT, 3}
+    {REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6},{REDUCE, 6}
+    {SHIFT, 5},{SHIFT, 4},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 9},{SHIFT, 3}
+    {SHIFT, 5},{SHIFT, 4},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{SHIFT, 11}
+    {ERROR, -1},{ERROR, -1},{SHIFT, 10},{SHIFT, 6},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1},{ERROR, -1}
+    {REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{SHIFT, 7},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1},{REDUCE, 1}
+    {REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5},{REDUCE, 5}
+    {REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3},{REDUCE, 3}
+}

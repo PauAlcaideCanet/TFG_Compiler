@@ -178,11 +178,20 @@ void markParents(Node *node) {
                 node->type = INT_OP;
                 break;
 
-            case T_OPERAND:
+            case T_SUM:
+            case T_MULT:
+            case T_SUB:
+            case T_EQUAL:
+            case T_NOT_EQUAL:
+            case T_LESS_THAN:
+            case T_LESS_EQUAL:
+            case T_MORE_THAN:
+            case T_MORE_EQUAL:
                 node->type = BINARY_OP;
                 break;
 
-            case T_SPECIALCHAR:
+            case T_OPEN_PAR:
+            case T_CLOSE_PAR:
                 node->type = PARENTHESIS_OP;
                 break;
             

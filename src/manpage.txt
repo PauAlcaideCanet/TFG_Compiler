@@ -1,10 +1,19 @@
 To execute:
 
-main <input_file_path> <flag>
+main <input_file_path> <token_file_path> <flag>
 
-The flags are optional
+The flags are optional, and there can be more than one if they are not contradictory
+
 FLAGS:
 
 -help   Show the manpage
+--> The program doesn't run 
+
 -t      Serialize the tree to an output file
+--> main <input_file_path> <token_file_path> -t 
+
 -rt     Read directly from the tree in the input file
+--> main <input_file_path> -rt
+
+-g      Generate MIPS code
+--> main <input_file_path> <token_file_path> -g

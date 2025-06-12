@@ -31,10 +31,19 @@ typedef enum {
     T_LITERAL,
         
     //Operations like +, *, ==, <=, ...
-    T_OPERAND,
+    T_SUM,
+    T_MULT,
+    T_SUB,
+    T_EQUAL,
+    T_NOT_EQUAL,
+    T_LESS_THAN,
+    T_MORE_THAN,
+    T_MORE_EQUAL,
+    T_LESS_EQUAL,
 
     //Symbols like ( ) or { }
-    T_SPECIALCHAR,
+    T_OPEN_PAR,
+    T_CLOSE_PAR,
 
     // For non recognized words
     T_NONRECOGNIZED,

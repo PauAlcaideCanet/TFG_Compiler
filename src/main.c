@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
     int helpFlag = 0;
     int readTreeFlag = 0;
     int serializeTreeFlag = 0;
+    int generate_code = 0;
     for (int i = 0; i< argc; i++){
         if (strcmp(argv[i], "-help") == 0){
             helpFlag = 1;
@@ -22,12 +23,14 @@ int main(int argc, char *argv[]) {
             readTreeFlag = 1;
         }else if (strcmp(argv[i], "-t") == 0){
             serializeTreeFlag = 1;
+        }else if (strcmp(argv[i], "-g") == 0){
+            generate_code = 1;
         }
     }
 
-    // If there are to few or too many arguments print the manpage
+    // If there are too few or arguments print the manpage
     // If the help flag is on print the manpage
-    if(argc < 2 || argc > 3 || helpFlag) { 
+    if(argc < 2 || helpFlag) { 
         // Open manpage
         FILE *manpage = fopen("manpage.txt", "r");  
         if (!manpage) {
@@ -45,6 +48,7 @@ int main(int argc, char *argv[]) {
     if (!input) {
         printf("Failed to open file\n");
     }
+    
     Node* root = NULL;
     
     //=========== DO THE PARSING PROCESS AND TREE GENERATION ================================
@@ -65,8 +69,15 @@ int main(int argc, char *argv[]) {
         initNodeStack(&AST);
 
 
-        // Get the list of tokens to parser from the input file
-        Token* tokens = deserializeTokens(input);
+        // Get the list of tokens to parser from the token input file
+
+        //Open input file
+        FILE *token_file = fopen(argv[2], "r");  
+        if (!token_file) {
+            printf("Failed to open file\n");
+        }
+
+        Token* tokens = deserializeTokens(token_file);
 
         // Process each token using the Shift-Reduce Automaton
         int step = 0;
@@ -99,29 +110,32 @@ int main(int argc, char *argv[]) {
         freeSR_Automata(&sra);
     }
     
-    #if (GEN_TREE == 1)
+    #if (PRINT_TREE == 1)
         //Print the Abstract Syntax Tree
         printf("\nThe tree is:\n");
         //printTree(root, 0);
         printTree(root, "", 1);
     #endif
 
-    //========================== CODE GENERATION SECTION ================
+    //========================== CODE GENERATION SECTION ==========================
 
-    //Open output file
-    FILE *out = fopen("code.asm", "w");  
-    if (!out) {
-        printf("Failed to open file\n");
+    // If the flag for code generation is on generate MIPS code
+    if (generate_code){
+        //Open output file
+        FILE *out = fopen("code.asm", "w");  
+        if (!out) {
+            printf("Failed to open file\n");
+        }
+
+        // Get the parents its type
+        markParents(root);
+
+        // Generate code for MIPS
+        cgen(root, out);
+
+        fclose(out);
     }
-
-    // Get the parents its type
-    markParents(root);
-
-    // Generate code for MIPS
-    cgen(root, out);
-
-    fclose(out);
-
+    
     // Free the tree struct
     freeTree(root);
 
