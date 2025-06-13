@@ -1,7 +1,7 @@
 #parser
 
 NUM_TERMINALS 6
-TERMINALS {T_NUMBER, T_OPEN_PAR, T_CLOSE_PAR, T_SUM, T_MULT, T_EOF}
+TERMINALS {T_INT, T_OPEN_PAR, T_CLOSE_PAR, T_SUM, T_MULT, T_EOF}
 NUM_NON_TERMINALS 4
 NON_TERMINALS {S, E, T, F} 
 NUM_RULES 7
@@ -12,7 +12,7 @@ PROD_RULES {
     {{T_NON_TERMINAL, T}, {{T_NON_TERMINAL, T}, {T_MULT, *}, {T_NON_TERMINAL, F}}, 3}    
     {{T_NON_TERMINAL, T}, {{T_NON_TERMINAL, F}}, 1}                                              
     {{T_NON_TERMINAL, F}, {{T_OPEN_PAR, (}, {T_NON_TERMINAL, E}, {T_CLOSE_PAR, )}}, 3}   
-    {{T_NON_TERMINAL, F}, {{T_NUMBER, NUM}}, 1}                                                    
+    {{T_NON_TERMINAL, F}, {{T_INT, NUM}}, 1}                                                    
 }
 START_STATE 0
 NUM_STATES 12

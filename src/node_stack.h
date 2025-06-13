@@ -1,10 +1,7 @@
-/*====================================================================================================
+/*
+    Base és el que els uneix com a expressions, és el NodeType
 
-This file contains the definition of the functions manipulate the stack of nodes.
-
-Made by Pau Alcaide Canet
-====================================================================================================*/
-
+*/
 
 #ifndef NODE_S
 #define NODE_S

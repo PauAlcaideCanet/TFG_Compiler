@@ -1,0 +1,3 @@
+#tokens
+<T_INT, 2> <T_MULT, *> <T_INT, 3>
+<T_EOF, "">

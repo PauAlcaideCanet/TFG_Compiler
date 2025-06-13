@@ -1,10 +1,6 @@
 /*====================================================================================================
 
-This file contains the implementation of the functions needed to create the Abstract Syntax Tree
-Also contains functions to serialize the information of the tree and deserialize it. 
-
-Finally  the functions to print and free the tree are provided with a method that visits the 
-tree recursively and marks the parents depending on the attributes of its children.
+This file contains the functions to create and manipulate nodes of the AST.
 
 Made by Pau Alcaide Canet
 ====================================================================================================*/
@@ -72,6 +68,7 @@ void serializeTree(Node *node, FILE *out, int white) {
 // Function to gather the information of the tree from the input file and initialize the tree structure
 Node* deserializeTree(FILE* in, int recursion){
 
+    printf("hola");
     char line[MAX_LINE_LENGHT];
 
     if(recursion == 0){
@@ -167,38 +164,22 @@ void markParents(Node *node) {
 
     Node_children *child = node->children;
     while (child != NULL) {
-        // ======= Pensar si puc sortir del bucle abans ========
-
         // Recursive call first to mark children
         markParents(child->child);
 
         // Check child's token category to decide parent's type
         switch (child->child->token.category) {
-            case T_NUMBER:
-                node->type = INT_OP;
-                break;
-
             case T_SUM:
             case T_MULT:
-            case T_SUB:
-            case T_EQUAL:
-            case T_NOT_EQUAL:
-            case T_LESS_THAN:
-            case T_LESS_EQUAL:
-            case T_MORE_THAN:
-            case T_MORE_EQUAL:
                 node->type = BINARY_OP;
                 break;
 
-            case T_OPEN_PAR:
-            case T_CLOSE_PAR:
-                node->type = PARENTHESIS_OP;
+            case T_INT:
+                node->type = INT_OP;
                 break;
-            
-            case T_KEYWORD:
-                if(strcmp(child->child->token.lexeme, "if") == 0){
-                    node->type = IF_OP;
-                }
+
+            case T_OPEN_PAR:
+                node->type = PARENTHESIS_OP;
                 break;
 
             default:

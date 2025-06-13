@@ -1,3 +1,2 @@
 #tokens
-<T_NUMBER, 5> <T_MULT, +> <T_NUMBER, 2> 
-<T_EOF, "">
+<T_NUMBER, 5> <T_SUM, +> <T_NUMBER, 2> <T_EOF, ""> 

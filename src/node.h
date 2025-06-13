@@ -1,14 +1,7 @@
-/*====================================================================================================
+/*
+    Base és el que els uneix com a expressions, és el NodeType
 
-This file contains the definition of the functions needed to create the Abstract Syntax Tree
-Also contains functions to serialize the information of the tree and deserialize it. 
-
-Finally  the functions to print and free the tree are provided with a method that visits the 
-tree recursively and marks the parents depending on the attributes of its children.
-
-Made by Pau Alcaide Canet
-====================================================================================================*/
-
+*/
 
 #ifndef NODE_H
 #define NODE_H

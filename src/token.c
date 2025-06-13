@@ -13,7 +13,9 @@ Made by Pau Alcaide Canet
 
 // From the category in string format, get the actual category
 TokenCat getTokenCategory(const char* cat_str) {
-    if (strcmp(cat_str, "T_NUMBER") == 0) return T_NUMBER;
+    if (strcmp(cat_str, "T_INT") == 0) return T_INT;
+    if (strcmp(cat_str, "T_FLOAT") == 0) return T_FLOAT;
+
     if (strcmp(cat_str, "T_IDENTIFIER") == 0) return T_IDENTIFIER;
     if (strcmp(cat_str, "T_KEYWORD") == 0) return T_KEYWORD;
     if (strcmp(cat_str, "T_LITERAL") == 0) return T_LITERAL;
@@ -43,7 +45,8 @@ TokenCat getTokenCategory(const char* cat_str) {
 
 // Get the category of the token in a string format
 char* getCategoryFromToken(Token token){
-    if (token.category == T_NUMBER) return "T_NUMBER";
+    if (token.category == T_INT) return "T_INT";
+    if (token.category == T_FLOAT) return "T_FLOAT";
     if (token.category == T_IDENTIFIER) return "T_IDENTIFIER";
     if (token.category == T_KEYWORD) return "T_KEYWORD";
     if (token.category == T_LITERAL) return "T_LITERAL";  

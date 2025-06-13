@@ -27,26 +27,26 @@ Made by Pau Alcaide Canet
 
 // Production rule definition
 typedef struct {
-    Token lhs;                          // Left hand side
-    Token* rhs;                         // Right hand side
-    int rhs_size;                       // Right hand side size
+    Token lhs;      // Left hand side
+    Token* rhs;     // Right hand side
+    int rhs_size;   // Right hand side size
 } Production_rule;
 
 //Grammar 
 typedef struct{
-    char** terminals;       // List of all the Terminals
-    int num_terminals;      // Needed to know how many Terminals does the CFG has
-    char** non_terminals;   // List of all the Non-Terminals
-    int num_non_terminals;  // Needed to know how many Non-Terminals does the CFG has
-    Production_rule* rules; // List of the production rule the CFG has
-    int num_rules;          // Needed to know how many production rules does the CFG has
+    char** terminals;
+    int num_terminals;
+    char** non_terminals;
+    int num_non_terminals;
+    Production_rule* rules;
+    int num_rules; 
 }CFG;
 
 //Alphabet entries definition
 typedef struct {
-    char* symbol;       // String containing the symbol of the alphabet
-    int column;         // Designed column in the parsing tables
-    int is_terminal;    // 1 if true | 0 if false
+    char* symbol;
+    int column;
+    int is_terminal; // 1 if true | 0 if false
 } Alphabet_symbol;
 
 // Possible actions
@@ -54,8 +54,8 @@ typedef enum { SHIFT, REDUCE, ACCEPT, ERROR } ActionType;
 
 // Action structure
 typedef struct {
-    ActionType type;    // Type of action [SHIFT, REDUCE, ACCEPT or ERROR]
-    int state;          // Transition state for Shift or production rule for Reduce
+    ActionType type;
+    int state;  // Transition state for Shift or production rule for Reduce
 } Action;
 
 //Automata definition

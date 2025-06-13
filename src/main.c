@@ -6,6 +6,7 @@
 #include "node.h"
 #include "node_stack.h"
 #include "cgen.h"
+#include "util.h"
 
 #define MAX_NUM_TOKENS 128
 
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]) {
     int helpFlag = 0;
     int readTreeFlag = 0;
     int serializeTreeFlag = 0;
-    int generate_code = 0;
+    int generateCode = 0;
     for (int i = 0; i< argc; i++){
         if (strcmp(argv[i], "-help") == 0){
             helpFlag = 1;
@@ -24,11 +25,11 @@ int main(int argc, char *argv[]) {
         }else if (strcmp(argv[i], "-t") == 0){
             serializeTreeFlag = 1;
         }else if (strcmp(argv[i], "-g") == 0){
-            generate_code = 1;
+            generateCode = 1;
         }
     }
 
-    // If there are too few or arguments print the manpage
+    // If there are to few arguments print the manpage
     // If the help flag is on print the manpage
     if(argc < 2 || helpFlag) { 
         // Open manpage
@@ -48,13 +49,13 @@ int main(int argc, char *argv[]) {
     if (!input) {
         printf("Failed to open file\n");
     }
-    
     Node* root = NULL;
     
     //=========== DO THE PARSING PROCESS AND TREE GENERATION ================================
 
     // If the flag to read the tree from the file is active, read it from the file
     if (readTreeFlag){
+        printf("Hola");
         root = deserializeTree(input,0);
 
     // Do all the parsing process
@@ -69,15 +70,13 @@ int main(int argc, char *argv[]) {
         initNodeStack(&AST);
 
 
-        // Get the list of tokens to parser from the token input file
-
-        //Open input file
-        FILE *token_file = fopen(argv[2], "r");  
-        if (!token_file) {
+        // Get the list of tokens to parser from the token file
+        //Open the token file
+        FILE *tokenFile = fopen(argv[2], "r");  
+        if (!tokenFile) {
             printf("Failed to open file\n");
         }
-
-        Token* tokens = deserializeTokens(token_file);
+        Token* tokens = deserializeTokens(tokenFile);
 
         // Process each token using the Shift-Reduce Automaton
         int step = 0;
@@ -96,6 +95,7 @@ int main(int argc, char *argv[]) {
 
         if(serializeTreeFlag){
             //Open output file
+            printf("Hola");
             FILE *out = fopen("outTree.txt", "w");  
             if (!out) {
                 printf("Failed to open file\n");
@@ -117,10 +117,9 @@ int main(int argc, char *argv[]) {
         printTree(root, "", 1);
     #endif
 
-    //========================== CODE GENERATION SECTION ==========================
-
-    // If the flag for code generation is on generate MIPS code
-    if (generate_code){
+    //========================== CODE GENERATION SECTION ================
+    if (generateCode){
+        printf("\nGenerating Code ...\n");
         //Open output file
         FILE *out = fopen("code.asm", "w");  
         if (!out) {
@@ -136,6 +135,7 @@ int main(int argc, char *argv[]) {
         fclose(out);
     }
     
+
     // Free the tree struct
     freeTree(root);
 

@@ -19,7 +19,8 @@ Made by Pau Alcaide Canet
 // Define the enum for Token category
 typedef enum {
     //NUMS (ints, floats)
-    T_NUMBER,
+    T_INT,
+    T_FLOAT,
 
     //For variables
     T_IDENTIFIER,
