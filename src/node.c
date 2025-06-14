@@ -1,6 +1,12 @@
 /*====================================================================================================
 
-This file contains the functions to create and manipulate nodes of the AST.
+This file contains the function to create nodes of the CST, as well as the function to add childs to a node
+necessary to build the tree and a function that transverses the tree, and changes the type variable
+of the parents depending on the children.
+
+Also functions to serialize the tree into a file and deserialize it from a file are implemented.
+
+Finally, the functions to print and free the tree structure are implemented.
 
 Made by Pau Alcaide Canet
 ====================================================================================================*/
@@ -203,10 +209,10 @@ void printTree(Node *node, const char *prefix, int isLast) {
 
     // Line of node printing
     if (isLast){
-        printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, "+-- ", node->id, node->token.lexeme, node->rule_num);
+        printf("%s%s Node %d: <Symbol: %s, Category: %s> [Rule: %d; Type: %d]\n", prefix, "+-- ", node->id, node->token.lexeme, getCategoryFromToken(node->token), node->rule_num, node->type);
         snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix,"    ");
     }else{
-        printf("%s%s Node %d: <Symbol: %s, Rule: %d>\n", prefix, "|-- ", node->id, node->token.lexeme, node->rule_num);
+        printf("%s%s Node %d: <Symbol: %s, Category: %s> [Rule: %d; Type: %d]\n", prefix, "|-- ",  node->id, node->token.lexeme, getCategoryFromToken(node->token), node->rule_num, node->type);
         snprintf(newPrefix, sizeof(newPrefix), "%s%s", prefix, "|   ");
     }
 

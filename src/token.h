@@ -5,6 +5,8 @@ that tokens can have.
 
 Also the declaration of the functions to create, free a token and some utility functions for tokens.
 
+Also provides the declaration of the function to deserialize tokens from a file.
+
 Made by Pau Alcaide Canet
 ====================================================================================================*/
 

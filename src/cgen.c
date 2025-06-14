@@ -1,5 +1,14 @@
+/*=========================================================================================
+
+This file contains the implementation of the code generation functions for Binary Operations
+between integers, handling parenthesis and the If statement.
+
+Made by Pau Alcaide Canet
+===========================================================================================*/
+
 #include "cgen.h"
 
+// This function generates the code for a standard node
 void cgen(Node *node, FILE *out) {
 
     switch(node->type){
@@ -35,7 +44,6 @@ void genInt(Node *node, FILE *out){
     fprintf(out, "li $a0, %s\n", num->token.lexeme);
 }
 
-
 // This function generates the code for a binary operation -------[ Assuming only integers ]-----------
 void genBinaryOp(Node *node, FILE *out){
         
@@ -64,5 +72,36 @@ void genBinaryOp(Node *node, FILE *out){
             fprintf(out, "mul $a0, $t1, $a0\n");      // Perfom the multiplication
         }// At the moment the division is not supported.
 
+}
+
+// This function generates code for If statements
+void genIf(Node *node, FILE *out) {
+    static int labelCount = 0;
+    int currentLabel = labelCount++;
+    
+    Node *cond = node->children->child;
+    Node *thenBlock = node->children->next->child;
+    Node *elseBlock = node->children->next->next->child;
+
+    // Generate code for condition -> result in $a0
+    cgen(cond, out);
+
+    // Compare $a0 with 0, branch to ELSE if false
+    fprintf(out, "beq $a0, $zero, else_%d\n", currentLabel);
+
+    // THEN block
+    cgen(thenBlock, out);
+    
+    // Jump over the else block after then
+    fprintf(out, "j endif_%d\n", currentLabel);
+
+    // ELSE block
+    fprintf(out, "else_%d:\n", currentLabel);
+    if (elseBlock) {
+        cgen(elseBlock, out);
+    }
+
+    // End of if statement
+    fprintf(out, "endif_%d:\n", currentLabel);
 }
 

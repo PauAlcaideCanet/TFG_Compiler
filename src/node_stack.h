@@ -1,7 +1,10 @@
-/*
-    Base és el que els uneix com a expressions, és el NodeType
+/*=========================================================================================
 
-*/
+This file contains the definition of the stack of nodes needed to build the 
+Concrete Syntax Tree.
+
+Made by Pau Alcaide Canet
+===========================================================================================*/
 
 #ifndef NODE_S
 #define NODE_S
@@ -15,7 +18,7 @@
 
 typedef struct {
     int top;
-    Node* nodes[MAX_NODE_STACK_SIZE];
+    Node* nodes[MAX_NODE_STACK_SIZE];   // List of nodes pending to be part of the CST
 } NodeStack;
 
 void initNodeStack(NodeStack* stack);

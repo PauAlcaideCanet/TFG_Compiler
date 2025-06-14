@@ -27,26 +27,26 @@ Made by Pau Alcaide Canet
 
 // Production rule definition
 typedef struct {
-    Token lhs;      // Left hand side
-    Token* rhs;     // Right hand side
-    int rhs_size;   // Right hand side size
+    Token lhs;              // Left hand side
+    Token* rhs;             // Right hand side
+    int rhs_size;           // Right hand side size
 } Production_rule;
 
 //Grammar 
 typedef struct{
-    char** terminals;
-    int num_terminals;
-    char** non_terminals;
-    int num_non_terminals;
-    Production_rule* rules;
-    int num_rules; 
+    char** terminals;       // List of the terminal symbols
+    int num_terminals;      // Used to allocate the memory and manipulate the terminal symbols
+    char** non_terminals;   // List of the non-terminal symbols
+    int num_non_terminals;  // Used to allocate the memory and manipulate the non-terminal symbols
+    Production_rule* rules; // List of the production rules
+    int num_rules;          // Used to allocate the memory and manipulate the production rules  
 }CFG;
 
 //Alphabet entries definition
 typedef struct {
-    char* symbol;
-    int column;
-    int is_terminal; // 1 if true | 0 if false
+    char* symbol;           
+    int column;             // Column that represents the symbol in the action table
+    int is_terminal;        // 1 if true | 0 if false
 } Alphabet_symbol;
 
 // Possible actions
@@ -55,18 +55,18 @@ typedef enum { SHIFT, REDUCE, ACCEPT, ERROR } ActionType;
 // Action structure
 typedef struct {
     ActionType type;
-    int state;  // Transition state for Shift or production rule for Reduce
+    int state;              // Transition state for Shift or production rule for Reduce
 } Action;
 
 //Automata definition
 typedef struct {
-    Alphabet_symbol *alphabet;
-    int num_symbols;                  
-    int num_states;        
-    int start_state;  
-    int num_accept_states;   
-    int *accepting_states;     
-    Action** transition_table;                
+    Alphabet_symbol *alphabet;  // Alphabet of the automata
+    int num_symbols;            // Number of symbols in the alphabet            
+    int num_states;             // Number of states in the Automata [number of rows in the action table]
+    int start_state;            
+    int num_accept_states;      // Number of accepting states, needed to initialize and manipulate the accepting states
+    int *accepting_states;      // List of the states in which the ACCEPT action can happen
+    Action** transition_table;  // Matrix in where for a terminal or non-terminal and the current state it returns the action that has to be performed              
 } Automata;
 
 // Shift-reduce Automata definition
@@ -103,6 +103,8 @@ void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rh
 int getColumn(Token token, Alphabet_symbol *alphabet, int num_symbols);
 int shift(SR_Automata *sra, Action action, Token input_token);
 int reduce(SR_Automata *sra, Action action, NodeStack* stackNode);
+int accept(SR_Automata *sra, int state);
+int error();
 int SRAutomata_step(SR_Automata *SRAutomata, Token input_token, NodeStack* stackNode);
 
 // Free memory functions

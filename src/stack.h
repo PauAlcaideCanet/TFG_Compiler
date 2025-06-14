@@ -22,7 +22,7 @@ typedef struct{
 
 // Stack structure
 typedef struct {
-    StackItem items[MAX_STACK];
+    StackItem items[MAX_STACK];     // List of tokens and the current state when they were added to the stack
     int top;
 } Stack;
 

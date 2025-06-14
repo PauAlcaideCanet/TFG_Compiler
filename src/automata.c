@@ -18,8 +18,10 @@ Made by Pau Alcaide Canet
 
 // Prints the production rules
 void printProductionRule(Production_rule rule) {
+    //Print left-hand side
     printToken(rule.lhs);
     printf(" ->");
+    // Print Right hand side
     for (int i = 0; i < rule.rhs_size; i++) {
         printf(" ");
         printToken(rule.rhs[i]);
@@ -31,18 +33,21 @@ void printProductionRule(Production_rule rule) {
 void printCFG(const CFG* cfg) {
     printf("-- CFG Details --\n");
 
+    // Print the terminal symbols
     printf("Terminals:\n");
     for (int i = 0; i < cfg->num_terminals; ++i) {
         printf("%s, ", cfg->terminals[i]);
     }
     printf("\n");
 
+    // Print the non-terminal symbols
     printf("Non-terminals:\n");
     for (int i = 0; i < cfg->num_non_terminals; ++i) {
         printf("%s, ", cfg->non_terminals[i]);
     }
     printf("\n");
 
+    // Print the production rules
     printf("Production Rules:\n");
     for (int i = 0; i < cfg->num_rules; ++i) {
         printProductionRule(cfg->rules[i]); 
@@ -84,20 +89,25 @@ void printAutomata(const Automata* automata){
     }
 
     printf("-- Automaton Details --\n");
+    // Print the number of states
     printf("Number of States: %d\n", automata->num_states);
+    // Print the starting state
     printf("Starting State: %d\n", automata->start_state);
 
+    // Print the accepting states
     printf("Accepting States:");
     for (int i = 0; i < automata->num_accept_states; ++i) {
         printf("%d, ", automata->accepting_states[i]);
     }
     printf("\n");
 
+    // Print the alphabet
     printf("Alphabet Symbols:\n");
     for (int i = 0; i < automata->num_symbols; ++i) {
         printSymbol(&automata->alphabet[i]);
     }
 
+    // Print the transition table
     printf("\nTransition Table:\n");
     for (int i = 0; i < automata->num_states; i++) {
         for (int j = 0; j < automata->num_symbols; j++) {
@@ -120,6 +130,7 @@ int getNum(FILE *file, const char* title){
         // Read the first (length of the string passed as parameter)
         if (strncmp(line, title, lenght) == 0) {
             int num;
+            // Read the number
             if (sscanf(line + lenght, " %d", &num) == 1) {
                 #if (DEBUG_RF == 1)
                     printf("Reading from the file: %s = %d\n", title, num);
@@ -283,6 +294,7 @@ int *getIntList(FILE *file, const char* title, int num_items){
 
     char* start;
     int item_count = 0;
+    // Allocate memory for the items in the list
     int* int_list = malloc (num_items * sizeof(int));
 
     while (fgets(line, sizeof(line), file)) {
@@ -608,6 +620,27 @@ int reduce(SR_Automata *sra, Action action, NodeStack* stackNode){
     return REDUCE;
 }
 
+// Implementation of the accept action
+int accept(SR_Automata *sra, int state){
+    
+    // Check if the state is an accepting state
+    for (int i = 0; i < sra->automata.num_accept_states; i++){
+        if (sra->automata.accepting_states[i] == state){
+            printf("Input accepted!\n");
+            return ACCEPT;
+        }
+    }
+    // Print error message in case you are trying to accept in a state that is not an accepting state
+    printf("You tried to end in a state which is not an accepting state!\n");
+    return ERROR;
+}
+
+// Implementation of the error action
+int error(Token token){
+    printf("There has been an error in the parsing process a token '%s'!\n", token.lexeme);
+    return ERROR;
+}
+
 // Executes a step of the Shift-Reduce Automata
 int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
     if (!sra) {
@@ -615,6 +648,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
         exit(EXIT_FAILURE);
     }
 
+    // Get the row and columns to search for the action table
     int state = peek(&sra->stack).state;
     int column = getColumn(input_token, sra->automata.alphabet, sra->automata.num_symbols);
 
@@ -623,6 +657,7 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
         return -1;
     }
 
+    // Search in the action table
     Action action = sra->automata.transition_table[state][column];
 
     switch (action.type) {
@@ -634,20 +669,11 @@ int SRAutomata_step(SR_Automata *sra, Token input_token, NodeStack* stackNode) {
             return reduce(sra, action, stackNode);
         
         case ACCEPT:
-            int num_accept =  sizeof(sra->automata.accepting_states)/sizeof(int);
-            for (int i = 0; i < num_accept; i++){
-                if (sra->automata.accepting_states[i] == state){
-                    printf("Input accepted!\n");
-                    return ACCEPT;
-                }
-            }
-            
-            printf("You tried to end in a state which is not an accepting state!\n");
-            return ERROR;
+            return accept(sra, state);
         
         case ERROR:
-            printf("There has been an error in the parsing process a token '%s'!\n", input_token.lexeme);
-            return ERROR;
+            return error(input_token);
+
         default:
             printf("Syntax error at token '%s'.\n", input_token.lexeme);
     }

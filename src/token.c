@@ -3,6 +3,8 @@
 This file contains the implementation of the functions to create, free, print and get information
 from the tokens.
 
+Also provides the implementation of the function to deserialize tokens from a file.
+
 Made by Pau Alcaide Canet
 ====================================================================================================*/
 
@@ -111,8 +113,6 @@ Token* deserializeTokens(FILE* file){
 
     // Read token lines until #parser
     while (fgets(line, sizeof(line), file)) {
-        if (strncmp(line, "#parser", 7) == 0) break;
-
         
         char *ptr = line;
         while (*ptr){

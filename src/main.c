@@ -129,6 +129,13 @@ int main(int argc, char *argv[]) {
         // Get the parents its type
         markParents(root);
 
+        #if (PRINT_TREE == 1)
+            //Print the Abstract Syntax Tree
+            printf("\nThe tree is:\n");
+            //printTree(root, 0);
+            printTree(root, "", 1);
+        #endif
+
         // Generate code for MIPS
         cgen(root, out);
 
