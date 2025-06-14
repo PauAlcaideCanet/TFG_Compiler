@@ -1,2 +1,8 @@
 # TFG_Compiler
-This is a simple compiler used for educational purposes
+This work explores the design and implementation of a compiler for educational purposes. The fact that it is made for educational purposes means that the design and implementation of it must be comprehensible by the students and work as a role model for them. 
+The project starts gathering all the information about compiler subjects in relevant international universities, focusing on the practice prospective and tools they use (FLEX, Bison, ANTLR4, and others). The project provides a comprehensive understanding of these tools, giving an initial practice to start working with them.
+The project is focused on a 4-pass compiler (preprocessor, lexer, parser, semantic analysis, and code generator). The compiler assumes already that the preprocessor and the lexer are implemented, and hence it focuses on the parser and code generation so that it reaches to get assembly code.
+The core part of the project is to design and develop a reduced C compiler that can be easily extended to a full compiler. The design puts special emphasis on building generic engines for each phase of the compiler so it can be configured for different compiled languages. Also, focusing on having each phase completely independent so each one can be proposed to the students as a separate practice. The assembly code is the final output of the project, and it should be coded so it runs in the MARS application.
+The compilers' theory combines theory from many subjects the students have already taken, and hence it includes complex data structures for each of the steps. The actual code includes the concepts of shift-reduce automaton, token, abstract syntax tree, and translation template.
+The compiler provides a specific trace output to follow the mechanisms and specific examples to show how to test it to learn what it supports and what it doesn’t.
+
