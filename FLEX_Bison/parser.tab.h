@@ -39,18 +39,11 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     KEYWORD = 258,
-     RETURN = 259,
-     IDENTIFIER = 260,
-     NUMBER = 261,
-     ASSIGN = 262,
-     PLUS = 263,
-     SEMICOLON = 264,
-     OPEN_PAREN = 265,
-     CLOSE_PAREN = 266,
-     OPEN_BRACE = 267,
-     CLOSE_BRACE = 268,
-     UNRECOGNIZED = 269
+     PLUS = 258,
+     MULT = 259,
+     OPEN_PAR = 260,
+     CLOSE_PAR = 261,
+     NUMBER = 262
    };
 #endif
 
@@ -61,16 +54,14 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 23 "parser.y"
+#line 10 "parser.y"
 
-    char character;   // for operators and punctuation
-    char word[20];    // for IDENTIFIER and KEYWORD
-    int num;          // for numbers
+    char *word;    // Correct way to store strings in union
 
 
 
 /* Line 1676 of yacc.c  */
-#line 74 "parser.tab.h"
+#line 65 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

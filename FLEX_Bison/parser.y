@@ -7,73 +7,37 @@
     void yyerror(const char *s);
 %}
 
-/* Token Definitions */
-%token KEYWORD RETURN IDENTIFIER NUMBER
-%token ASSIGN PLUS SEMICOLON
-%token OPEN_PAREN CLOSE_PAREN OPEN_BRACE CLOSE_BRACE
-%token UNRECOGNIZED
-%left PLUS
-
-/* Type Definitions */
-%type <num> NUMBER expression
-%type <word> IDENTIFIER
-%type <character> ASSIGN PLUS SEMICOLON
-%type <character> OPEN_PAREN CLOSE_PAREN OPEN_BRACE CLOSE_BRACE
-
 %union {
-    char character;   // for operators and punctuation
-    char word[20];    // for IDENTIFIER and KEYWORD
-    int num;          // for numbers
+    char *word;    // Correct way to store strings in union
 }
 
-%%
+
+/* Token Definitions */
+%token PLUS 
+%token MULT
+%token OPEN_PAR
+%token CLOSE_PAR
+%token <word> NUMBER
+
 
 /* Grammar Rules */
-program:
-    function
+%%
+
+e:
+      e PLUS t         { printf("A sum has been encountered!\n"); }
+    | t
     ;
 
-function:
-    KEYWORD IDENTIFIER OPEN_PAREN CLOSE_PAREN OPEN_BRACE statements CLOSE_BRACE
-    { printf("Valid function definition: %s\n", $2); }
+t:
+      t MULT f         { printf("A multiplication has been encountered!\n"); }
+    | f
     ;
 
-statements:
-    statements statement
-    | /* empty */
+f:
+      OPEN_PAR e CLOSE_PAR   { printf("Parenthesis encountered!\n"); }
+    | NUMBER                 { printf("Number encountered: %s\n", $1); free($1); }
     ;
 
-statement:
-    declaration
-    | assignment
-    | return_stmt
-    ;
-
-declaration:
-    KEYWORD IDENTIFIER ASSIGN expression SEMICOLON
-    { printf("Declaration: %s = %d\n", $2, $4); }
-    | KEYWORD IDENTIFIER SEMICOLON
-    { printf("Declaration: %s\n", $2); }
-    ;
-
-assignment:
-    IDENTIFIER ASSIGN expression SEMICOLON
-    { printf("Assignment: %s = %d\n", $1, $3); }
-    ;
-
-return_stmt:
-    RETURN expression SEMICOLON
-    { printf("Return statement: %d\n", $2); }
-    ;
-
-expression:
-    NUMBER
-    { $$ = $1; printf("The number is %d\n", $1); }
-    | IDENTIFIER
-    { printf("Identifier: %s\n", $1); }
-    | expression PLUS expression
-    { $$ = $1 + $3; printf("Result: %d\n", $$); }
-    ;
 %%
 
 /* Error Handling */

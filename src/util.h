@@ -18,11 +18,11 @@ Made by Pau Alcaide Canet
 
 /*========================================================================================*/
 /*------------- When enabled (1) it shows the operations done by the parser -------------*/
-#define DEBUGTOKEN 1
+#define DEBUGTOKEN 0
 /*========================================================================================*/
 
 // Putting GEN_TREE to ON(1) makes the program print the tree
-#define PRINT_TREE 1
+#define PRINT_TREE 0
 
 #define MAX_LINE_LENGHT 256
 
