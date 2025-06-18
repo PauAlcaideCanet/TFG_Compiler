@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
 
     // If the flag to read the tree from the file is active, read it from the file
     if (readTreeFlag){
-        printf("Hola");
         root = deserializeTree(input,0);
 
     // Do all the parsing process
@@ -95,7 +94,6 @@ int main(int argc, char *argv[]) {
 
         if(serializeTreeFlag){
             //Open output file
-            printf("Hola");
             FILE *out = fopen("outTree.txt", "w");  
             if (!out) {
                 printf("Failed to open file\n");

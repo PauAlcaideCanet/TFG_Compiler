@@ -48,9 +48,9 @@ void genInt(Node *node, FILE *out){
 void genBinaryOp(Node *node, FILE *out){
         
         //Get the right and left opperand nodes
-        Node *left = node->children->child;
+        Node *right = node->children->child;
         Node *op = node->children->next->child;
-        Node *right = node->children->next->next->child;
+        Node *left = node->children->next->next->child;
 
         // Get the code for the left side in the accumulator
         cgen(left, out);

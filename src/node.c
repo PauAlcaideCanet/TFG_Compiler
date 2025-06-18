@@ -43,38 +43,49 @@ void addChild(Node *parent, Node *child) {
 void serializeTree(Node *node, FILE *out, int white) {
     if (!node) return;
 
-    printf("Serializing node: %d\n", node->id);
-
-    // Print the tabulations before the node
-    for(int i = 0; i< white; i++){
+    // Print indentation
+    for (int i = 0; i < white; i++) {
         fprintf(out, "\t");
     }
 
-    // Print the node
+    // Print node info
     fprintf(out, "(ID: %d; RULE: %d; CATEGORY: %s; LEXEME: \"%s\" [\n", 
         node->id, 
         node->rule_num, 
         getCategoryFromToken(node->token), 
         node->token.lexeme);
 
-    // Print the children recursively
-    Node_children *child = node->children;
-    while (child) {
-        serializeTree(child->child, out, (white + 1));
-        child = child->next;
+    // Collect the children to serialize into an array
+    int child_count = 0;
+    Node_children *current = node->children;
+    while (current) {
+        child_count++;
+        current = current->next;
     }
 
-    // Print the closing brackets for the node
-    for(int i = 0; i< white; i++){
+    Node *children[child_count];
+    current = node->children;
+    for (int i = child_count - 1; i >= 0; i--) {
+        children[i] = current->child;
+        current = current->next;
+    }
+
+    // Serialize the children
+    for (int i = 0; i < child_count; i++) {
+        serializeTree(children[i], out, white + 1);
+    }
+
+    // Print closing
+    for (int i = 0; i < white; i++) {
         fprintf(out, "\t");
     }
     fprintf(out, "])\n");
 }
 
+
 // Function to gather the information of the tree from the input file and initialize the tree structure
 Node* deserializeTree(FILE* in, int recursion){
 
-    printf("hola");
     char line[MAX_LINE_LENGHT];
 
     if(recursion == 0){

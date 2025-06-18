@@ -503,36 +503,38 @@ void initSRAutomata(SR_Automata* sra, FILE* file) {
 /*============== RUN SECTION ======================*/
 // In this section the functions needed to run the parser and generate the AST are found.
 
-// When there is a Reduce step, build the AST 
-void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num){
+void buildNodeFromRule(Production_rule rule, NodeStack *nodeStack, StackItem *rhsTokens, int rule_num) {
     // Create the supernode for the LHS token
     Node *lhsNode = createTreeNode(rule.lhs, rule_num);
 
-    // Iterate over the RHS tokens
-    for (int i = 0; i < rule.rhs_size; ++i) {
-        Token token = rhsTokens[i].token;
+    // Temporary array to store children in correct order
+    Node *children[rule.rhs_size];
 
-        //Create the child node
+    // Pop children from the stack in reverse RHS order
+    for (int i = rule.rhs_size - 1; i >= 0; --i) {
+        Token token = rhsTokens[i].token;
         Node *child = NULL;
 
         if (token.category == T_NON_TERMINAL) {
-            // Pop node from stack (previous subtree)
             child = pop_node(nodeStack);
             if (!child) {
                 printf("Error: Stack underflow when handling non-terminal.\n");
                 exit(EXIT_FAILURE);
             }
         } else {
-            // Create a new node for the terminal token
             child = createTreeNode(token, -1);
         }
 
-        addChild(lhsNode, child);
+        children[i] = child; // Store in correct order
     }
 
-    // Push the newly built subtree (lhsNode) onto the stack
-    push_node(nodeStack, lhsNode);
+    // Add children to the LHS node in left-to-right order
+    for (int i = 0; i < rule.rhs_size; ++i) {
+        addChild(lhsNode, children[i]);
+    }
 
+    // Push the subtree back to the stack
+    push_node(nodeStack, lhsNode);
 }
 
 // Returns the associated column for the introduced token 

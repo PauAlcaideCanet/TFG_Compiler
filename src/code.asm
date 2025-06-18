@@ -4,4 +4,4 @@ addiu $sp, $sp, -4
 li $a0, 3
 lw $t1, 4($sp)
 addiu $sp, $sp, 4
-mul $a0, $t1, $a0
+add $a0, $t1, $a0
