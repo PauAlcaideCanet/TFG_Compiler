@@ -22,7 +22,7 @@ Made by Pau Alcaide Canet
 /*========================================================================================*/
 
 // Putting GEN_TREE to ON(1) makes the program print the tree
-#define PRINT_TREE 0
+#define PRINT_TREE 1
 
 #define MAX_LINE_LENGHT 256
 

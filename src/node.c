@@ -21,9 +21,11 @@ Node* createTreeNode(Token token, int rule) {
     if (node != NULL) {
         node->id = current_id++;  // Assign and increment the ID
         node->rule_num = rule;     
-        node->token = token;
         node->children = NULL;
         node->type = NULL_OP;
+
+        node->token.category = token.category;
+        node->token.lexeme = strdup(token.lexeme);
     }
     return node;
 }
@@ -81,7 +83,6 @@ void serializeTree(Node *node, FILE *out, int white) {
     }
     fprintf(out, "])\n");
 }
-
 
 // Function to gather the information of the tree from the input file and initialize the tree structure
 Node* deserializeTree(FILE* in, int recursion){
@@ -208,7 +209,7 @@ void markParents(Node *node) {
     }
 }
 
-// Function to print the Abstract Syntax tree 
+// Function to print the Concrete Syntax Tree 
 void printTree(Node *node, const char *prefix, int isLast) {
     // prefix takes care of the indentation and the starting string to print in each line
     // isLast is a boolean that is true (1) when the node is the last child of its parent
