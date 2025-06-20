@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
         initSRAutomata(&sra, input);
 
         //Create stack for the creation of the AST
-        NodeStack AST;
-        initNodeStack(&AST);
+        NodeStack CST;
+        initNodeStack(&CST);
 
 
         // Get the list of tokens to parser from the token file
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
         int i = 0;
         while (i < MAX_NUM_TOKENS && step != ERROR && step != ACCEPT) {
 
-            step = SRAutomata_step(&sra, tokens[i], &AST);
+            step = SRAutomata_step(&sra, tokens[i], &CST);
 
             if (step == SHIFT){
                 freeToken(&tokens[i]);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        root = peek_node(&AST);
+        root = peek_node(&CST);
 
         if(serializeTreeFlag){
             //Open output file

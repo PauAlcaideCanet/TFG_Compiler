@@ -199,6 +199,12 @@ void markParents(Node *node) {
             case T_OPEN_PAR:
                 node->type = PARENTHESIS_OP;
                 break;
+            
+            case T_KEYWORD:
+                if (strcmp("if", child->child->token.lexeme)==0){
+                    node->type = IF_OP;
+                }
+                break;
 
             default:
                 // Do nothing if no match

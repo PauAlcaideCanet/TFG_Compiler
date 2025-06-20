@@ -12,7 +12,7 @@ Made by Pau Alcaide Canet
 
 /*========================================================================================*/
 /*------------- When enabled (1) it shows information caught when reading from the input file -------------*/
-#define DEBUG_RF 0
+#define DEBUG_RF 1
 /*========================================================================================*/
 
 

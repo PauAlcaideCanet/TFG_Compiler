@@ -10,7 +10,6 @@ Made by Pau Alcaide Canet
 
 // This function generates the code for a standard node
 void cgen(Node *node, FILE *out) {
-
     switch(node->type){
         case BINARY_OP:
             genBinaryOp(node, out);
@@ -28,6 +27,10 @@ void cgen(Node *node, FILE *out) {
         // This means that is a non-terminal followed by a non-terminal
         case NULL_OP:
             cgen(node->children->child, out);
+            break;
+
+        case IF_OP:
+            genIf(node, out);
             break;
 
         default:
