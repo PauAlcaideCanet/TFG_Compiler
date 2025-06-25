@@ -12,17 +12,17 @@ Made by Pau Alcaide Canet
 
 /*========================================================================================*/
 /*------------- When enabled (1) it shows information caught when reading from the input file -------------*/
-#define DEBUG_RF 1
+#define DEBUG_RF 0
 /*========================================================================================*/
 
 
 /*========================================================================================*/
 /*------------- When enabled (1) it shows the operations done by the parser -------------*/
-#define DEBUGTOKEN 0
+#define DEBUGTOKEN 1
 /*========================================================================================*/
 
 // Putting GEN_TREE to ON(1) makes the program print the tree
-#define PRINT_TREE 1
+#define PRINT_TREE 0
 
 #define MAX_LINE_LENGHT 256
 
