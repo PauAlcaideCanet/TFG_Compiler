@@ -6,7 +6,7 @@ The project explores the main stages of compilation, from source code processing
 
 The goal of this project was to apply theoretical computer science concepts in a practical and structured software engineering context, building a working simple compiler pipeline that students can use to understand the compilation stages. 
 
-### 🧠 Project Objectives** 
+### 🧠 Project Objectives 
 - Design and implement a complete compilation pipeline
 - Apply formal language and compiler theory to real code
 - Build modular and maintainable components
@@ -31,7 +31,17 @@ Each phase is implemented as a clearly separated module, enabling easier reasoni
 - Bottom-up Parsing
 - Concrete Syntax Trees (CST)
 - Modular software architecture
-- 
+
+### Features
+- Addition and substraction (+/-)
+- Multiplication (*)
+- Use of parenthesis
+
+This is an input example:
+```c
+2+3
+´´´
+  
 ### 🚀 How to Run
 ```bash
 gcc main.c -o my_program
@@ -47,4 +57,4 @@ gcc main.c -o my_program
 ### 👤 Author
 Pau Alcaide Canet
 Computer Engineering Graduate
-LinkedIn · GitHub
+[LinkedIn](www.linkedin.com/in/pau-alcaide-canet) · [GitHub](https://github.com/PauAlcaideCanet)
