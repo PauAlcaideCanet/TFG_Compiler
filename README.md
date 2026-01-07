@@ -57,4 +57,4 @@ gcc main.c -o my_program
 ### 👤 Author
 Pau Alcaide Canet
 Computer Engineering Graduate
-[LinkedIn](www.linkedin.com/in/pau-alcaide-canet) · [GitHub](https://github.com/PauAlcaideCanet)
+[LinkedIn](https://www.linkedin.com/in/pau-alcaide-canet) · [GitHub](https://github.com/PauAlcaideCanet)
