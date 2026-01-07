@@ -1,4 +1,4 @@
-# Simple Compiler for Education
+# Reduced Compiler for Education
 
 ### 📌 Overview 
 This repository contains my Bachelor’s Thesis (TFG) project, focused on the design and implementation of a compiler. 
