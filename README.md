@@ -44,8 +44,21 @@ This is an input example:
   
 ### 🚀 How to Run
 ```bash
-gcc main.c -o my_program
-./my_program
+main <input_file_path> <token_input_path> <flag>
+```
+The flags are optional
+FLAGS:
+
+**-help**   Show the manpage
+
+**-t**      Serialize the tree to an output file
+**-g**      Generate MIPS code
+
+**-rt**     Read directly from the tree in the input file
+
+In case this flag is used for the input files is only necessary the tree file:
+```
+main <input_tree_path> <flag>
 ```
 
 ### 📌 Future Improvements
