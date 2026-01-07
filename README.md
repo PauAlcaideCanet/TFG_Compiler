@@ -61,6 +61,9 @@ In case this flag is used for the input files is only necessary the tree file:
 main <input_tree_path> <flag>
 ```
 
+It prints some comments (which can be skipped using debug flags):
+![Compiler Pipeline](images/Compiler_1.png)
+
 ### 📌 Future Improvements
 - Optimization passes
 - Extended language features
