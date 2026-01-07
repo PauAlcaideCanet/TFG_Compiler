@@ -1,15 +1,14 @@
 # Simple Compiler for Education
 
-📌 Overview
---------
+**📌 Overview**
+
 
 This repository contains my Bachelor’s Thesis (TFG) project, focused on the design and implementation of a compiler.
 The project explores the main stages of compilation, from source code processing to code generation, with an emphasis on software architecture, correctness, and system-level reasoning.
 
 The goal of this project was to apply theoretical computer science concepts in a practical and structured software engineering context, building a working simple compiler pipeline that students can use to understand the compilation stages.
 
-🧠 Project Objectives
---------
+**🧠 Project Objectives**
 
 - Design and implement a complete compilation pipeline
 
@@ -17,8 +16,7 @@ The goal of this project was to apply theoretical computer science concepts in a
 
 - Build modular and maintainable components
 
-⚙️ Compiler Structure
---------
+**⚙️ Compiler Structure**
 
 The project is organized around the classical compiler phases:
 
@@ -34,8 +32,7 @@ The project is organized around the classical compiler phases:
 
 Each phase is implemented as a clearly separated module, enabling easier reasoning, testing, and extension.
 
-🛠️ Technologies & Concepts
---------
+**🛠️ Technologies & Concepts**
 
 - Programming Languages: C 
 
@@ -54,7 +51,8 @@ gcc main.c -o my_program
 ./my_program
 
 
-# 📌 Future Improvements
+📌 Future Improvements
+--------
 
 Optimization passes
 
@@ -64,7 +62,8 @@ Improved error handling
 
 Additional target architectures
 
-# 👤 Author
+👤 Author
+--------
 
 Pau Alcaide Canet
 Computer Engineering Graduate
