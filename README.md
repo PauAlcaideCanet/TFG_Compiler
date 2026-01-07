@@ -1,6 +1,7 @@
 # Simple Compiler for Education
 
 📌 Overview
+--------
 
 This repository contains my Bachelor’s Thesis (TFG) project, focused on the design and implementation of a compiler.
 The project explores the main stages of compilation, from source code processing to code generation, with an emphasis on software architecture, correctness, and system-level reasoning.
@@ -8,6 +9,7 @@ The project explores the main stages of compilation, from source code processing
 The goal of this project was to apply theoretical computer science concepts in a practical and structured software engineering context, building a working simple compiler pipeline that students can use to understand the compilation stages.
 
 🧠 Project Objectives
+--------
 
 - Design and implement a complete compilation pipeline
 
@@ -16,6 +18,7 @@ The goal of this project was to apply theoretical computer science concepts in a
 - Build modular and maintainable components
 
 ⚙️ Compiler Structure
+--------
 
 The project is organized around the classical compiler phases:
 
@@ -32,6 +35,7 @@ The project is organized around the classical compiler phases:
 Each phase is implemented as a clearly separated module, enabling easier reasoning, testing, and extension.
 
 🛠️ Technologies & Concepts
+--------
 
 - Programming Languages: C 
 
@@ -42,10 +46,12 @@ Each phase is implemented as a clearly separated module, enabling easier reasoni
 - Modular software architecture
 
 
-# 🚀 How to Run
+🚀 How to Run
+--------
 
-make
-./compiler input_file
+```bash
+gcc main.c -o my_program
+./my_program
 
 
 # 📌 Future Improvements
