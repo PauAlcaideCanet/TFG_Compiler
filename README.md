@@ -40,7 +40,7 @@ Each phase is implemented as a clearly separated module, enabling easier reasoni
 This is an input example:
 ```c
 2+3
-´´´
+```
   
 ### 🚀 How to Run
 ```bash
